@@ -1,0 +1,8 @@
+.form {
+    @import './forms/login-form',
+            './forms/store-form';
+}
+
+.section {
+    @import './store-face/store-face';
+}

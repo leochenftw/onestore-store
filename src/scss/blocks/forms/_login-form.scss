@@ -1,0 +1,19 @@
+&.login {
+    background-color: $white;
+    position: fixed;
+    width: 100%;
+    max-width: 480px;
+    padding: 0 24px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    .title {
+        img {
+            display: block;
+            max-height: 80px;
+            width: auto;
+            max-width: none;
+            margin: 0 auto;
+        }
+    }
+}
