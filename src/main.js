@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 require('@/utils/utilities');
 // require('lightbox2');
+require('jquery.scrollto');
 require("babel-polyfill"); // Enable promises on IE11 etc
 
 Vue.config.productionTip = false;
@@ -22,6 +23,7 @@ global._ = _;
 global.axios = axios;
 global.base_url = location.hostname == 'localhost' ? 'https://onestore.leochen.co.nz/' : '';
 global.endpoints = require('@/config/endpoints');
+global.store_name   =   'OneStore';
 global.logo = null;
 global.can_query    =   false;
 
@@ -29,7 +31,8 @@ axios.get(
     base_url + endpoints.store
 ).then((resp) => {
     $('html title').html('OneStore - ' + resp.data.title);
-    logo    =   resp.data.logo;
+    store_name  =   resp.data.title;
+    logo        =   resp.data.logo;
     new Vue({
         el: '#app',
         router,

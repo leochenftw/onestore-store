@@ -6,3 +6,63 @@
 .section {
     @import './store-face/store-face';
 }
+
+@import './modal/modal';
+#btn-hold {
+    position: absolute;
+    right: 24px;
+    opacity: 0;
+    transition: all ease-out 0.3s;
+    top: 0;
+    transform: translateY(-50%);
+    visibility: none;
+    &.is-active {
+        top: 20px;
+        opacity: 1;
+        transform: translateY(0%);
+        visibility: visible;
+    }
+}
+
+#stash {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    width: calc(40% - 48px);
+    .button {
+        &:not(:last-child) {
+            margin-right: 0.5em;
+        }
+        height: auto;
+        .columns {
+            margin-top: 0;
+            margin-bottom: 0;
+            .column {
+                padding-top: 0;
+                padding-bottom: 0;
+                .fas {
+                    font-size: 20px;
+                    line-height: 24px;
+                }
+                &:first-child {
+                    padding-right: 0;
+                }
+
+                &:last-child {
+                    padding-left: 5px;
+                }
+
+                span {
+                    line-height: 1;
+                    display: block;
+                    font-size: 14px;
+                    &:last-child {
+                        font-weight: bold;
+                        letter-spacing: -1px;
+                        font-size: 8px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -3,5 +3,6 @@
     "session"   :   "api/v/1/session",
     "signin"    :   "api/v/1/signin",
     "signout"   :   "api/v/1/signout",
-    "lookup"    :   "api/v/1/lookup"
+    "lookup"    :   "api/v/1/lookup",
+    "order"     :   "api/v/1/store-order"
 }

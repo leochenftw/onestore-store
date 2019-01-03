@@ -21,16 +21,18 @@ Number.prototype.kmark = function() {
 };
 
 String.prototype.toDollar = function toDollar(digits) {
-    var n = this.toFloat();
+    let n           =   this.toFloat(),
+        minus_mark  =   n < 0 ? '-' : '';
     n = Math.round(n * 100) / 100;
     digits = (digits === null || digits === undefined) ? 2 : digits;
-    return '$' + n.toFixed(digits).kmark();
+    return minus_mark + '$' + Math.abs(n).toFixed(digits).kmark();
 };
 
 Number.prototype.toDollar = function toDollar(digits) {
-    var n = this;
+    let n           =   this,
+        minus_mark  =   n < 0 ? '-' : '';
     digits = (digits === null || digits === undefined) ? 2 : digits;
-    return '$' + n.toFixed(digits).kmark();
+    return minus_mark + '$' + Math.abs(n).toFixed(digits).kmark();
 };
 
 String.prototype.toFloat = function toFloat() {

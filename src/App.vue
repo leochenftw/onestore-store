@@ -4,6 +4,7 @@
         <router-view v-if="authenticated == true" />
         <LoginForm v-if="authenticated == false" />
     </main>
+    <MessageBox />
 </div>
 </template>
 
@@ -12,13 +13,15 @@ import Header from './components/blocks/Header';
 import Footer from './components/blocks/Footer';
 import slugify from 'slugify';
 import LoginForm from './components/blocks/LoginForm';
+import MessageBox from './components/blocks/MessageBox';
 
 export default {
     name: 'App',
     components: {
         Header,
         Footer,
-        LoginForm
+        LoginForm,
+        MessageBox
     },
     data() {
         return {

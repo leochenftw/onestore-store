@@ -52,18 +52,29 @@ export default {
                 me.is_loading   =   false;
                 if (resp.data.type == 'product') {
                     me.$parent.add_item(resp.data.data);
+                } else if (resp.data.type == 'discount') {
+                    me.$parent.toggle_discount(resp.data.data);
                 }
                 me.$parent.toggle_loading();
             }).catch((error) => {
                 me.is_loading   =   false;
                 me.$parent.toggle_loading();
+                if (error.response && error.response.data && error.response.data.message) {
+                    me.$bus.$emit('showMessage', error.response.data.message);
+                }
             });
         },
         focusing() {
+            let me  =   this;
             $(this.$el).find('.input').blur(function(e)
             {
                 if (can_query) {
                     $(this).focus();
+                }
+            }).keydown(function(e)
+            {
+                if (e.keyCode == 27) {
+                    me.input    =   null;
                 }
             }).focus();
         }
