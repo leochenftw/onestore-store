@@ -21,7 +21,7 @@ axios.defaults.withCredentials = true;
 global._ = _;
 // global.NProgress = NProgress;
 global.axios = axios;
-global.base_url = location.hostname == 'localhost' ? 'https://onestore.leochen.co.nz/' : '';
+global.base_url = location.hostname == 'localhost' ? 'https://onestore.leochen.co.nz/' : 'http://store.one-stop.co.nz/';
 global.endpoints = require('@/config/endpoints');
 global.store_name   =   'OneStore';
 global.store_info   =   null;
