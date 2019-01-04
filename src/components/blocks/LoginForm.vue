@@ -25,8 +25,8 @@ export default
     name    :   'LoginForm',
     data() {
         return {
-            email       :   'leo@leochen.co.nz',
-            pass        :   '110119cjj',
+            email       :   null,
+            pass        :   null,
             is_loading  :   false,
             logo        :   logo
         }
