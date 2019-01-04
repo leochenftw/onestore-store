@@ -1,12 +1,12 @@
 <template>
 <tr :class="['cart-item', {'has-text-danger' : source.refund}]">
-    <td>
+    <td class="col-title">
         {{source.title}}
         <em v-if="source.refund" style="font-size: 14px; display: block;"><small>refund item</small></em>
         <span class="has-text-danger" v-if="!source.discountable && show_discountable" style="font-size: 14px; display: block;"><small>- not discountable -</small></span>
     </td>
-    <td style="width: 15%;" class="has-text-centered">{{source.unit_price.toDollar()}}</td>
-    <td style="width: 12%;" class="has-text-centered">
+    <td style="width: 15%;" class="col-price has-text-centered">{{source.unit_price.toDollar()}}</td>
+    <td style="width: 12%;" class="col-qty has-text-centered">
         <input
             @dblclick.prevent="dblclick"
             @blur="blur"
@@ -17,8 +17,8 @@
             :readonly="!can_edit"
         />
     </td>
-    <td style="width: 20%;" class="has-text-right">{{subtotal}}</td>
-    <td style="white-space: nowrap; width: 62px;">
+    <td style="width: 20%;" class="col-subtotal has-text-right">{{subtotal}}</td>
+    <td v-if="!is_viewing" class="hide-in-print" style="white-space: nowrap; width: 62px;">
         <div class="option-more" v-if="show_options">
             <button class="button is-warning" @click.prevent="refund"><template v-if="source.refund">cancel </template>refund</button>
             <button class="button is-danger" @click.prevent="remove">remove</button>
@@ -36,7 +36,7 @@
 export default
 {
     name        :   'CartItem',
-    props       :   ['source', 'show_discountable'],
+    props       :   ['source', 'show_discountable', 'is_viewing'],
     data() {
         return {
             can_edit        :   false,

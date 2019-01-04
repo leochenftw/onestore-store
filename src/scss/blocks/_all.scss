@@ -8,6 +8,11 @@
 }
 
 @import './modal/modal';
+svg.barcode {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
 #btn-hold {
     position: absolute;
     right: 24px;
@@ -65,4 +70,25 @@
             }
         }
     }
+}
+
+#btn-hold,
+#stash {
+    @media print {
+        display: none;
+    }
+}
+
+#receipt-misc,
+#store-info {
+    display: none;
+    font-size: 10px;
+    line-height: 1.2;
+    @media print {
+        display: block;
+    }
+}
+
+#receipt-misc {
+    padding-bottom: 2rem;
 }

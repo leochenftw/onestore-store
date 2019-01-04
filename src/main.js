@@ -24,6 +24,7 @@ global.axios = axios;
 global.base_url = location.hostname == 'localhost' ? 'https://onestore.leochen.co.nz/' : '';
 global.endpoints = require('@/config/endpoints');
 global.store_name   =   'OneStore';
+global.store_info   =   null;
 global.logo = null;
 global.can_query    =   false;
 
@@ -33,6 +34,7 @@ axios.get(
     $('html title').html('OneStore - ' + resp.data.title);
     store_name  =   resp.data.title;
     logo        =   resp.data.logo;
+    store_info  =   resp.data;
     new Vue({
         el: '#app',
         router,

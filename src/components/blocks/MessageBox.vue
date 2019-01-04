@@ -20,10 +20,11 @@ export default {
     name        : 'MessageBox',
     data() {
         return {
-            show    :   false,
-            type    :   'danger',
-            title   :   store_name,
-            content :   null
+            show        :   false,
+            type        :   'danger',
+            title       :   store_name,
+            content     :   null,
+            callback    :   null
         };
     },
     created() {
@@ -42,7 +43,7 @@ export default {
                 this.close();
             }
         },
-        to_show(message, type, title) {
+        to_show(message, type, title, callback) {
             let me  =   this;
             me.show =   true;
             if (type) {
@@ -52,16 +53,24 @@ export default {
                 me.title    =   title;
             }
 
+            if (callback) {
+                me.callback =   callback;
+            }
+
             me.content  =   message;
             can_query   =   false;
             $('#lookup').blur();
         },
         close() {
             $(window).unbind('keydown', this.keydownhandler);
+            if (this.callback) {
+                this.callback();
+            }
             this.show       =   false;
             this.title      =   store_name;
             this.type       =   'danger';
             this.content    =   null;
+            this.callback   =   null;
             can_query       =   true;
             $('#lookup').focus();
         }

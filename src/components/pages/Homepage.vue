@@ -3,8 +3,13 @@
     <h1 class="title is-marginless">
         <img :class="['icon', {'is-loading': is_loading}]" src="@/assets/icon-coin.svg" />
         <img :src="logo" class="logo" alt="Store face" />
+        <div id="store-info" class="has-text-right" v-if="store_info">
+            <p v-if="store_info.title">{{store_info.title}}</p>
+            <p v-if="store_info.gst">GST: {{store_info.gst}}</p>
+            <p v-if="store_info.phone">{{store_info.phone}}</p>
+        </div>
     </h1>
-    <div id="stash" v-if="stash.length > 0">
+    <div id="stash" v-if="stash.length > 0 && !view_mode">
         <button @click.prevent="pop_stash(item.id)" :data-id="item.id" v-for="(item, i) in stash" class="button is-danger">
             <span class="columns is-mobile">
                 <span class="column">
@@ -17,8 +22,8 @@
             </span>
         </button>
     </div>
-    <button @click.prevent="put_onhold" id="btn-hold" :class="['button is-outlined is-danger', {'is-active': goods.length > 0}]"><span class="icon"><i class="far fa-hand-paper"></i></span></button>
-    <StoreForm />
+    <button v-if="!view_mode" @click.prevent="put_onhold" id="btn-hold" :class="['button is-outlined is-danger', {'is-active': goods.length > 0}]"><span class="icon"><i class="far fa-hand-paper"></i></span></button>
+    <StoreForm v-if="!view_mode" />
     <div class="container cart-items">
         <table class="table is-fullwidth">
             <thead>
@@ -27,17 +32,23 @@
                     <th style="width: 15%;" class="has-text-centered">Unit Price</th>
                     <th style="width: 12%;" class="has-text-centered">Qty</th>
                     <th style="width: 20%;" class="has-text-right">Sub total</th>
-                    <th style="width: 62px;">&nbsp;</th>
+                    <th v-if="!view_mode" class="hide-in-print" style="width: 62px;">&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
-                <CartItem :source="item" :show_discountable="discount" :key="i" v-for="(item, i) in goods" />
+                <CartItem :is_viewing="view_mode" :source="item" :show_discountable="discount" :key="i" v-for="(item, i) in goods" />
             </tbody>
         </table>
     </div>
-    <Summary :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
+    <div id="receipt-misc" v-if="receipt">
+        <p><strong>NOTE: </strong>ALL PRICES ARE GST INCLUSIVE</p>
+        <p><strong>Operator: </strong>{{receipt.by}}</p>
+        <p><strong>Paid at: </strong><span id="paid-at">{{receipt.at}}</span></p>
+    </div>
+    <Summary :is_viewing="view_mode" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />
     <EftposPauser />
+    <Barcode v-if="receipt" :barcode="receipt.barcode" />
 </div>
 </template>
 
@@ -48,16 +59,20 @@ import Summary from '../blocks/Summary';
 import moment from 'moment';
 import ChangeGiver from '../blocks/ChangeGiver';
 import EftposPauser from '../blocks/EftposPauser';
+import Barcode from '../blocks/Barcode';
 export default {
     name: 'Homepage',
-    components : {StoreForm, CartItem, Summary, ChangeGiver, EftposPauser},
+    components : {StoreForm, CartItem, Summary, ChangeGiver, EftposPauser, Barcode},
     data() {
         return {
+            view_mode   :   false,
+            store_info  :   store_info,
             logo        :   logo,
             goods       :   [],
             discount    :   null,
             is_loading  :   false,
-            stash       :   []
+            stash       :   [],
+            receipt     :   null
         };
     },
     watch       :   {
@@ -68,6 +83,9 @@ export default {
         }
     },
     methods     :   {
+        do_receipt(data) {
+            this.receipt    =   data;
+        },
         translate_time(val) {
             return moment(val).format('HH:mm');
         },
@@ -94,7 +112,7 @@ export default {
                     id              :   product.id,
                     title           :   product.title,
                     unit_price      :   product.price,
-                    quantity        :   1,
+                    quantity        :   product.quantity ? product.quantity : 1,
                     refund          :   false,
                     discountable    :   product.discountable
                 });
@@ -126,6 +144,30 @@ export default {
                 this.stash.splice(i, 1);
             }
             window.localStorage.stash   =   JSON.stringify(this.stash);
+        },
+        reprint_receipt(receipt) {
+            this.view_mode  =   true;
+            if (receipt.goods) {
+                let me  =   this;
+                receipt.goods.forEach((o) => {
+                    me.add_item(o);
+                });
+            }
+
+            if (receipt.discount) {
+                this.toggle_discount(receipt.discount);
+            }
+
+            if (receipt.order) {
+                this.do_receipt(receipt.order);
+                this.$bus.$emit('onMethdDominated', receipt.order.method);
+            }
+        },
+        reset() {
+            this.goods      =   [];
+            this.discount   =   null;
+            this.receipt    =   null;
+            this.view_mode  =   false;
         }
     },
     created() {
@@ -145,17 +187,16 @@ export default {
 
             this.goods.forEach((o) => {
                 if (o.discountable) {
-                    amount          +=  (o.quantity * o.unit_price * factor);
+                    amount          +=  (o.quantity * o.unit_price * factor * (o.refund ? -1 : 1));
                 } else {
-                    nondiscountable +=  (o.quantity * o.unit_price);
+                    nondiscountable +=  (o.quantity * o.unit_price * (o.refund ? -1 : 1));
                 }
             });
 
             if (this.discount && this.discount.type == 'byAmount') {
-                amount -= this.discount.value;
+                amount -=   this.discount.value;
+                amount  =   amount < 0 ? 0 : amount;
             }
-
-            amount  =   amount < 0 ? 0 : amount;
 
             return amount + nondiscountable;
         }

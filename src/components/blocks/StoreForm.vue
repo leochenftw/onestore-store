@@ -24,7 +24,9 @@ export default {
     },
     methods: {
         submit(e) {
-            e.preventDefault();
+            if (e) {
+                e.preventDefault();
+            }
             if (!this.input) return false;
             if (this.input == 'signout') {
                 let me      =   this;
@@ -54,6 +56,8 @@ export default {
                     me.$parent.add_item(resp.data.data);
                 } else if (resp.data.type == 'discount') {
                     me.$parent.toggle_discount(resp.data.data);
+                } else {
+                    me.$parent.reprint_receipt(resp.data.data);
                 }
                 me.$parent.toggle_loading();
             }).catch((error) => {
@@ -87,6 +91,11 @@ export default {
                 $('#lookup').focus();
             }
         });
+
+        if (this.$route.query && this.$route.query.receipt) {
+            this.input  =   this.$route.query.receipt;
+            this.submit();
+        }
     },
     mounted() {
         can_query   =   true;

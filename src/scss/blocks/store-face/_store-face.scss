@@ -1,6 +1,10 @@
 &.store-face {
     padding: 5rem 24px 20px;
     height: 100vh;
+    @media print {
+        padding: 20px 10px;
+        height: auto;
+    }
     h1.title {
         z-index: 9;
         transition: all ease-out 0.3s;
@@ -30,6 +34,12 @@
                 }
             }
         }
+        @media print {
+            position: static;
+            transform: none;
+            display: flex;
+            justify-content: space-between;
+        }
     }
 
     .container {
@@ -41,13 +51,34 @@
             transition: all ease-out 0.3s;
             transition-delay: 0s;
             opacity: 0;
+            @media print {
+                height: auto;
+                padding-top: 1rem;
+                padding-bottom: 2rem;
+            }
             .table {
+                @media print {
+                    display: block;
+                }
+
+                tbody {
+                    @media print {
+                        display: block;
+                    }
+                }
                 tr {
                     th {
                         font-size: 16px;
                         font-weight: normal;
                         text-transform: uppercase;
                         padding: 12px;
+                        @media print {
+                            font-size: 8px;
+                            padding: 5px;
+                            line-height: 1.2;
+                            vertical-align: middle;
+                            color: #000;
+                        }
                     }
                     &.cart-item {
                         td {
@@ -55,6 +86,12 @@
                             font-size: 32px;
                             line-height: 1.2;
                             position: relative;
+                            @media print {
+                                color: #000;
+                                font-size: 10px;
+                                padding: 5px;
+                                vertical-align: middle;
+                            }
                             .button {
                                 transform: translateY(2px);
                                 &.toggler {
@@ -82,6 +119,18 @@
                                 &::-webkit-outer-spin-button {
                                     -webkit-appearance: none;
                                 }
+                                @media print {
+                                    font-size: 12px;
+                                    height: auto;
+                                }
+                            }
+
+                            &.col {
+                                &-title {
+                                    @media print {
+
+                                    }
+                                }
                             }
                         }
                     }
@@ -104,6 +153,63 @@
                 &:first-child {
                     margin-right: 1em;
                 }
+                &.is-primary.is-outlined {
+                    &.is-active {
+                        background-color: #00d1b2;
+                        border-color: #00d1b2;
+                        color: #fff;
+                    }
+                }
+                &.is-warning.is-outlined {
+                    &.is-active {
+                        background-color: #ffdd57;
+                        border-color: #ffdd57;
+                        color: rgba(0, 0, 0, 0.7);
+                    }
+                }
+            }
+
+            @media print {
+                height: auto;
+                .columns {
+                    margin: 0;
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    .column {
+                        flex: none;
+                        width: 100%;
+                        padding-left: 0;
+                        padding-right: 0;
+                        color: #000;
+                        text-align: right;
+                        &:last-child {
+                            padding-top: 0;
+                        }
+                        .button {
+                            margin: 0;
+                            font-size: 16px;
+                            background-color: transparent !important;
+                            border-color: #000 !important;
+                            color: #000 !important;
+                            &:not(.is-active) {
+                                display: none;
+                            }
+                        }
+                        .title {
+                            font-size: 36px !important;
+                            font-weight: lighter !important;
+                            color: #000;
+                            .button {
+                                display: inline-flex;
+                                font-size: 12px;
+                            }
+                        }
+
+                        .subtitle {
+                            color: #000;
+                        }
+                    }
+                }
             }
         }
     }
@@ -116,6 +222,9 @@
             img {
                 transition-delay: 0s;
                 max-height: 40px;
+            }
+            @media print {
+                transform: none;
             }
         }
         .container {
