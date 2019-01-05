@@ -15505,8 +15505,10 @@ svg.barcode {
 #receipt-misc,
 #store-info {
   display: none;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.4;
+  -webkit-font-feature-settings: "kern";
+          font-feature-settings: "kern";
 }
 
 @media print {

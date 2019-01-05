@@ -41,9 +41,9 @@
         </table>
     </div>
     <div id="receipt-misc" v-if="receipt">
-        <p>NOTE: ALL PRICES ARE GST INCLUSIVE</p>
-        <p>Operator: {{receipt.by}}</p>
-        <p>Paid at: <span id="paid-at">{{receipt.at}}</span></p>
+        <p><strong>NOTE: </strong>ALL PRICES ARE GST INCLUSIVE</p>
+        <p><strong>Operator: </strong>{{receipt.by}}</p>
+        <p><strong>Paid at: </strong><span id="paid-at">{{receipt.at}}</span></p>
     </div>
     <Summary :is_viewing="view_mode" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />
