@@ -3,7 +3,7 @@
     <div class="field has-addons">
         <div class="control is-expanded">
             <div class="text is-fullwidth">
-                <input id="lookup" type="text" class="input is-small" v-model="input" />
+                <input autocomplete="off" id="lookup" type="text" class="input is-small" v-model="input" />
             </div>
         </div>
         <div class="control">

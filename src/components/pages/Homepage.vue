@@ -147,6 +147,7 @@ export default {
         },
         reprint_receipt(receipt) {
             this.view_mode  =   true;
+            this.goods  =   [];
             if (receipt.goods) {
                 let me  =   this;
                 receipt.goods.forEach((o) => {

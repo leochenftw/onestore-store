@@ -13,6 +13,13 @@ svg.barcode {
     max-width: 100%;
     height: auto;
 }
+
+small {
+    @media print {
+        font-size: 8px;
+    }
+}
+
 #btn-hold {
     position: absolute;
     right: 24px;
@@ -91,4 +98,7 @@ svg.barcode {
 
 #receipt-misc {
     padding-bottom: 2rem;
+    p {
+        color: $black;
+    }
 }

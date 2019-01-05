@@ -4174,7 +4174,7 @@ button,
 input,
 select,
 textarea {
-  font-family: "Montserrat", sans-serif;
+  font-family: source-han-sans-simplified-c, Helvetica, Arial, sans-serif;
 }
 
 code,
@@ -15374,6 +15374,8 @@ label.panel-block:hover {
     display: -ms-inline-flexbox;
     display: inline-flex;
     font-size: 12px;
+    -webkit-transform: translateY(10px);
+            transform: translateY(10px);
   }
   .section.store-face .container.summary .columns .column .subtitle {
     color: #000;
@@ -15415,6 +15417,12 @@ svg.barcode {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+@media print {
+  small {
+    font-size: 8px;
+  }
 }
 
 #btn-hold {
@@ -15510,6 +15518,10 @@ svg.barcode {
 
 #receipt-misc {
   padding-bottom: 2rem;
+}
+
+#receipt-misc p {
+  color: #0a0a0a;
 }
 
 @media print {

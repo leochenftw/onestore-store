@@ -13,6 +13,8 @@
 @import 'config/typography',
         'config/animations';
 
+$family-primary: source-han-sans-simplified-c, Helvetica, Arial, sans-serif;
+
 @import "bulma";
 
 @import 'blocks/all';

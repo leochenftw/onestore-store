@@ -6,7 +6,7 @@
     :jsbarcode-value="barcode"
     jsbarcode-textmargin="0"
     jsbarcode-fontoptions="bold"
-    jsbarcode-height="40"
+    jsbarcode-height="60"
 >
 </svg>
 </template>
