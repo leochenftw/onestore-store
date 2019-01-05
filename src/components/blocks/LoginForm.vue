@@ -15,6 +15,7 @@
         <div class="control">
             <button type="submit" :class="['button is-primary is-large is-fullwidth', {'is-loading': is_loading}]">Submit</button>
         </div>
+        <p v-if="failed" class="help has-text-centered is-danger">Incorrect email or password!</p>
     </div>
 </form>
 </template>
@@ -28,13 +29,24 @@ export default
             email       :   null,
             pass        :   null,
             is_loading  :   false,
-            logo        :   logo
+            logo        :   logo,
+            failed      :   false
+        }
+    },
+    watch   :   {
+        email(nv, ov) {
+            this.failed =   false;
+        },
+        pass(nv, ov) {
+            this.failed =   false;
         }
     },
     methods :   {
         submit(e) {
             e.preventDefault();
             if (this.is_loading) return false;
+            if (!this.email || this.email.trim().length == 0) return false;
+            if (!this.pass || this.pass.trim().length == 0) return false;
 
             this.is_loading =   true;
 
@@ -50,6 +62,7 @@ export default
                 me.is_loading   =   false;
             }).catch((error) => {
                 me.is_loading   =   false;
+                me.failed       =   true;
             });
         }
     }
