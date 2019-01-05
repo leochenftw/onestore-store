@@ -15509,6 +15509,7 @@ svg.barcode {
   line-height: 1.4;
   -webkit-font-feature-settings: "kern";
           font-feature-settings: "kern";
+  font-family: Arial, sans-serif;
 }
 
 @media print {
