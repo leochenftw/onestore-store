@@ -16,7 +16,7 @@
                 <button class=" is-danger button" v-if="discount">{{discount.title}}</button>
                 {{total_amount}}
             </p>
-            <p class="subtitle is-7">incl. GST {{gst}}<template v-if="receipt"><br />Received {{receipt.cash.toDollar()}} cash; Given {{given_change}} change</template></p>
+            <p class="subtitle is-7">incl. GST {{gst}}<template v-if="receipt && receipt.cash"><br />Received {{receipt.cash.toDollar()}} cash; Given {{given_change}} change</template></p>
         </div>
     </div>
 </div>
