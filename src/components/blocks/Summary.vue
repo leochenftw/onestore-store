@@ -6,6 +6,7 @@
             <button :disabled="eftpos_disabled" @click.prevent="wati_eftpos" :class="['is-outlined button is-large is-primary', {'is-active': payment_method == 'EFTPOS'}]">EFTPOS</button>
         </div>
         <div class="column" v-else>
+            <button class="button is-large is-danger" @click.prevent="do_exit">Exit</button>
             <button class="button is-large is-info is-outlined" @click.prevent="do_print">Print</button>
             <button v-if="payment_method == 'Cash'" class="is-outlined button is-large is-warning is-active">CASH</button>
             <button v-if="payment_method == 'EFTPOS'" class="is-outlined button is-large is-primary is-active">EFTPOS</button>
@@ -60,6 +61,16 @@ export default {
         }
     },
     methods     :   {
+        do_exit() {
+            let me  =   this;
+            me.cash_loading     =   false;
+            me.eftpos_loading   =   false;
+            me.cash_disabled    =   false;
+            me.eftpos_disabled  =   false;
+            me.payment_method   =   null;
+            me.$router.replace('/');
+            me.$parent.reset();
+        },
         do_print() {
             window.print();
             this.reset();
