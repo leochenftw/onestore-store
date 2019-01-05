@@ -41,7 +41,7 @@ export default
     computed    :   {
         outstanding() {
             let amount  =   this.amount ? this.amount : 0,
-                change  =   amount - this.topay;
+                change  =   amount - (Math.round(this.topay * 10) * 0.1);
             change      =   change > 0 ? change : 0;
 
             return change.toDollar();
@@ -79,7 +79,7 @@ export default
         },
         do_callback() {
             if (this.callback) {
-                this.callback('Cash');
+                this.callback('Cash', this.amount);
             }
             this.close();
         },

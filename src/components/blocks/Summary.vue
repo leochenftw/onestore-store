@@ -1,7 +1,7 @@
 <template>
 <div :class="['container summary', extra_classes]">
     <div class="columns is-mobile">
-        <div class="column" v-if="!is_viewing">
+        <div class="column" v-if="!receipt">
             <button :disabled="cash_disabled" @click.prevent="give_change" :class="['is-outlined button is-large is-warning', {'is-active': payment_method == 'Cash'}]">CASH</button>
             <button :disabled="eftpos_disabled" @click.prevent="wati_eftpos" :class="['is-outlined button is-large is-primary', {'is-active': payment_method == 'EFTPOS'}]">EFTPOS</button>
         </div>
@@ -16,7 +16,7 @@
                 <button class=" is-danger button" v-if="discount">{{discount.title}}</button>
                 {{total_amount}}
             </p>
-            <p class="subtitle is-7">incl. GST {{gst}}</p>
+            <p class="subtitle is-7">incl. GST {{gst}}<template v-if="receipt"><br />Received {{receipt.cash.toDollar()}} cash; Given {{given_change}} change</template></p>
         </div>
     </div>
 </div>
@@ -25,14 +25,22 @@
 <script>
 export default {
     name        :   'Summary',
-    props       :   ['total', 'discount', 'extra_classes', 'is_viewing'],
+    props       :   ['total', 'discount', 'extra_classes', 'receipt'],
     data() {
         return {
             cash_loading    :   false,
             eftpos_loading  :   false,
             cash_disabled   :   false,
             eftpos_disabled :   false,
-            payment_method  :   null
+            payment_method  :   null,
+            cash_taken      :   null
+        }
+    },
+    watch       :   {
+        receipt(nv, ov) {
+            if (nv) {
+
+            }
         }
     },
     created() {
@@ -45,6 +53,12 @@ export default {
         this.$bus.$off('onMethdDominated');
     },
     computed    :   {
+        given_change() {
+            let amount  =   this.receipt.cash.toFloat() ? this.receipt.cash.toFloat() : 0,
+                change  =   amount - (Math.round(this.total * 10) * 0.1);
+            change      =   change > 0 ? change : 0;
+            return change.toDollar();
+        },
         total_amount() {
             if (this.total) {
                 return this.total.toDollar();
@@ -83,7 +97,7 @@ export default {
             this.payment_method =   'EFTPOS';
             this.$bus.$emit('waitEFTPOS', this.total, this.place_order);
         },
-        place_order(by) {
+        place_order(by, amount_taken) {
             if (this.cash_loading || this.eftpos_loading) return false;
 
             if (by == 'EFTPOS') {
@@ -99,6 +113,10 @@ export default {
 
             params.append('by', by);
             params.append('list', JSON.stringify(this.$parent.goods));
+            if (amount_taken) {
+                this.cash_taken =   amount_taken;
+                params.append('cash_taken', this.cash_taken);
+            }
 
             if (this.discount) {
                 params.append('discount', this.discount.id);
@@ -121,6 +139,7 @@ export default {
                 me.cash_disabled    =   false;
                 me.eftpos_disabled  =   false;
                 me.payment_method   =   null;
+                me.cash_taken       =   null;
                 if (error.response && error.response.data && error.response.data.message) {
                     me.$bus.$emit('showMessage', error.response.data.message);
                 }
@@ -134,6 +153,7 @@ export default {
                 me.cash_disabled    =   false;
                 me.eftpos_disabled  =   false;
                 me.payment_method   =   null;
+                me.cash_taken       =   null;
                 me.$router.replace('/');
                 me.$parent.reset();
             });

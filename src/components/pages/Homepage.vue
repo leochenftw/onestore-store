@@ -45,7 +45,7 @@
         <p><strong>Operator: </strong>{{receipt.by}}</p>
         <p><strong>Paid at: </strong><span id="paid-at">{{receipt.at}}</span></p>
     </div>
-    <Summary :is_viewing="view_mode" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
+    <Summary :receipt="receipt" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />
     <EftposPauser />
     <Barcode v-if="receipt" :barcode="receipt.barcode" />
@@ -113,7 +113,7 @@ export default {
                     title           :   product.title,
                     unit_price      :   product.price,
                     quantity        :   product.quantity ? product.quantity : 1,
-                    refund          :   false,
+                    refund          :   product.refund ? parseInt(product.refund) : parseInt(product.refund),
                     discountable    :   product.discountable
                 });
             }
