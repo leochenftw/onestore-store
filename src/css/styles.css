@@ -15514,18 +15514,19 @@ svg.barcode {
   #store-info {
     display: block;
   }
-}
-
-#store-info p {
-  font-weight: normal;
+  #receipt-misc p,
+  #store-info p {
+    color: #000;
+    font-weight: normal;
+  }
+  #receipt-misc p strong,
+  #store-info p strong {
+    color: #000;
+  }
 }
 
 #receipt-misc {
   padding-bottom: 2rem;
-}
-
-#receipt-misc p {
-  color: #000;
 }
 
 @media print {

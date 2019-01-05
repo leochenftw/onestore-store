@@ -93,18 +93,16 @@ small {
     line-height: 1.2;
     @media print {
         display: block;
-    }
-}
-
-#store-info {
-    p {
-        font-weight: normal;
+        p {
+            color: #000;
+            font-weight: normal;
+            strong {
+                color: #000;
+            }
+        }
     }
 }
 
 #receipt-misc {
     padding-bottom: 2rem;
-    p {
-        color: #000;
-    }
 }
