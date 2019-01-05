@@ -16,7 +16,10 @@
                 <button class=" is-danger button" v-if="discount">{{discount.title}}</button>
                 {{total_amount}}
             </p>
-            <p class="subtitle is-7">incl. GST {{gst}}<template v-if="receipt && receipt.cash"><br />Received {{receipt.cash.toDollar()}} cash; Given {{given_change}} change</template></p>
+            <p class="subtitle is-7">
+                incl. GST {{gst}}
+                <template v-if="cash_taken"><br />Received {{cash_taken.toDollar()}} cash; Given {{given_change}} change</template>
+            </p>
         </div>
     </div>
 </div>
@@ -39,7 +42,7 @@ export default {
     watch       :   {
         receipt(nv, ov) {
             if (nv) {
-
+                this.cash_taken =   this.receipt.cash;
             }
         }
     },
@@ -54,7 +57,7 @@ export default {
     },
     computed    :   {
         given_change() {
-            let amount  =   this.receipt.cash.toFloat() ? this.receipt.cash.toFloat() : 0,
+            let amount  =   this.cash_taken ? this.cash_taken.toFloat() : 0,
                 change  =   amount - (Math.round(this.total * 10) * 0.1);
             change      =   change > 0 ? change : 0;
             return change.toDollar();
@@ -87,7 +90,7 @@ export default {
         },
         do_print() {
             window.print();
-            this.reset();
+            this.slient_reset();
         },
         give_change() {
             this.payment_method =   'Cash';
@@ -144,6 +147,17 @@ export default {
                     me.$bus.$emit('showMessage', error.response.data.message);
                 }
             });
+        },
+        slient_reset() {
+            let me  =   this;
+            me.cash_loading     =   false;
+            me.eftpos_loading   =   false;
+            me.cash_disabled    =   false;
+            me.eftpos_disabled  =   false;
+            me.payment_method   =   null;
+            me.cash_taken       =   null;
+            me.$router.replace('/');
+            me.$parent.reset();
         },
         reset() {
             let me  =   this;
