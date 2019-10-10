@@ -19,7 +19,7 @@ export default {
     data() {
         return {
             is_loading  :   false,
-            input       :   null
+            input       :   this.$route.query.receipt ? this.$route.query.receipt : null
         }
     },
     methods: {
