@@ -1,5 +1,5 @@
 <template>
-<div :class="['section store-face', {'has-goods' : goods.length > 0}]">
+<div :class="['section store-face', {'has-goods' : goods.length > 0}, {'is-blurred': clookup_activated}]">
     <h1 class="title is-marginless">
         <img :class="['icon', {'is-loading': is_loading}]" src="@/assets/icon-coin.svg" />
         <img :src="logo" class="logo" alt="Store face" />
@@ -23,7 +23,11 @@
         </button>
     </div>
     <button v-if="!view_mode" @click.prevent="put_onhold" id="btn-hold" :class="['button is-outlined is-danger', {'is-active': goods.length > 0}]"><span class="icon"><i class="far fa-hand-paper"></i></span></button>
-    <StoreForm v-if="!view_mode" />
+
+    <button v-if="!view_mode" @click.prevent="toggle_customer_lookup" id="btn-call-member-input" :class="['button is-danger', {'is-active': goods.length > 0}, {'is-outlined': !clookup_activated}]"><span class="icon" v-if="customer">{{customer.first_name[0]}}</span><span class="icon" v-else><i class="fas fa-user"></i></span></button>
+
+    <CustomerSearchForm :is_active="clookup_activated" v-if="!view_mode" />
+    <StoreForm ref="storeform" v-if="!view_mode" />
     <div class="container cart-items">
         <table class="table is-fullwidth">
             <thead>
@@ -40,6 +44,16 @@
             </tbody>
         </table>
     </div>
+
+    <ul id="coupon-list" v-if="coupons.length" :class="{'show': coupons_shown}">
+        <li v-for="item in coupons">
+            <button @click.prevent="create_virtual_discount(item, $event)" class="button is-danger">
+                {{item.title}}
+                <i :class="['far fa-check-circle', {'is-visible': (coupon && coupon.id == item.id)}]"></i>
+            </button>
+        </li>
+    </ul>
+
     <div id="receipt-misc" v-if="receipt">
         <p><strong>NOTE: </strong>ALL PRICES ARE GST INCLUSIVE</p>
         <p><strong>Operator: </strong>{{receipt.by}}</p>
@@ -60,29 +74,50 @@ import moment from 'moment';
 import ChangeGiver from '../blocks/ChangeGiver';
 import EftposPauser from '../blocks/EftposPauser';
 import Barcode from '../blocks/Barcode';
+import CustomerSearchForm from '../blocks/CustomerSearchForm';
+
 export default {
     name: 'Homepage',
-    components : {StoreForm, CartItem, Summary, ChangeGiver, EftposPauser, Barcode},
+    components : {StoreForm, CartItem, Summary, ChangeGiver, EftposPauser, Barcode, CustomerSearchForm},
     data() {
         return {
-            view_mode   :   false,
-            store_info  :   store_info,
-            logo        :   logo,
-            goods       :   [],
-            discount    :   null,
-            is_loading  :   false,
-            stash       :   [],
-            receipt     :   null
+            view_mode           :   false,
+            store_info          :   store_info,
+            logo                :   logo,
+            goods               :   [],
+            discount            :   null,
+            is_loading          :   false,
+            stash               :   [],
+            receipt             :   null,
+            clookup_activated   :   false,
+            customer            :   null,
+            coupon              :   null,
+            coupons             :   [],
+            coupons_shown       :   false
         };
     },
     watch       :   {
         goods(nv, ov) {
             if (nv.length == 0) {
-                this.discount   =   null;
+                this.discount       =   null;
+                this.customer       =   null;
+                this.coupons        =   [];
+                this.coupon         =   null;
+                this.coupons_shown  =   false;
             }
         }
     },
     methods     :   {
+        toggle_customer_lookup(e)
+        {
+            can_query               =   !can_query;
+            this.clookup_activated  =   !this.clookup_activated;
+            if (can_query) {
+                this.$nextTick().then(() => {
+                    this.$refs.storeform.focusing();
+                });
+            }
+        },
         do_receipt(data) {
             this.receipt    =   data;
         },
@@ -95,12 +130,17 @@ export default {
         toggle_discount(discount) {
             if (!this.goods) return;
             if (this.goods.length == 0) return;
-            if (!this.discount) {
+            if (this.coupon) {
+                this.coupon     =   null;
                 this.discount   =   discount;
-            } else if (this.discount.id == discount.id) {
-                this.discount   =   null;
             } else {
-                this.discount   =   discount;
+                if (!this.discount) {
+                    this.discount   =   discount;
+                } else if (this.discount.id == discount.id) {
+                    this.discount   =   null;
+                } else {
+                    this.discount   =   discount;
+                }
             }
         },
         add_item(product) {
@@ -128,16 +168,29 @@ export default {
             if (this.goods.length > 0) {
                 this.stash.push({
                     id      :   Date.now(),
-                    list    :   _.clone(this.goods)
+                    list    :   _.clone(this.goods),
+                    customer:   this.customer,
+                    coupons :   this.coupons,
+                    coupon  :   this.coupon
                 });
                 window.localStorage.stash   =   JSON.stringify(this.stash);
-                this.goods  =   [];
+                this.goods          =   [];
+                this.customer       =   null;
+                this.coupons        =   [];
+                this.coupon         =   null;
+                this.coupons_shown  =   false;
             }
         },
         pop_stash(id) {
             let i       =   _.findIndex(this.stash, o => o.id == id);
             if (i >= 0) {
-                let item    =   this.stash[i];
+                let item        =   this.stash[i];
+                this.customer   =   item.customer;
+                this.coupons    =   item.coupons;
+                this.coupon     =   item.coupon;
+                if (this.coupon) {
+                    this.create_virtual_discount(this.coupon);
+                }
                 for (let n = 0; n < item.list.length; n++) {
                     this.goods.push(item.list[n]);
                 }
@@ -168,10 +221,37 @@ export default {
             }
         },
         reset() {
-            this.goods      =   [];
+            this.goods          =   [];
+            this.discount       =   null;
+            this.receipt        =   null;
+            this.view_mode      =   false;
+            this.customer       =   null;
+            this.coupon         =   null;
+            this.coupons_shown  =   false;
+        },
+        toggle_coupons()
+        {
+            if (this.coupons.length) {
+                this.coupons_shown  =   !this.coupons_shown;
+            }
+        },
+        create_virtual_discount(coupon, e)
+        {
+            this.coupon     =   coupon;
+            this.discount   =   {
+                id: coupon.id,
+                title: coupon.title,
+                by: '-',
+                rate: coupon.worth
+            };
+            if (e) {
+                this.toggle_coupons();
+            }
+        },
+        cancel_discount(e)
+        {
+            this.coupon     =   null;
             this.discount   =   null;
-            this.receipt    =   null;
-            this.view_mode  =   false;
         }
     },
     created() {

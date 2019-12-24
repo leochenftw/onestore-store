@@ -169,6 +169,26 @@
                 }
             }
 
+            .discount-total {
+                position: relative;
+                .button {
+                    margin-right: 0;
+                    &.is-circle {
+                        position: absolute;
+                        top: 0.65rem;
+                        right: -3rem;
+                    }
+                }
+
+                .is-tiny {
+                    font-size: 12px;
+                }
+
+                * {
+                    vertical-align: middle;
+                }
+            }
+
             @media print {
                 height: auto;
                 .columns {
@@ -232,6 +252,14 @@
             &.cart-items {
                 transition-delay: 0.2s;
                 opacity: 1;
+            }
+        }
+    }
+
+    &.is-blurred {
+        & > * {
+            &:not(#customer-lookup-form):not(#btn-call-member-input) {
+                filter: blur(.5rem);
             }
         }
     }

@@ -3821,6 +3821,19 @@ readers do not read off random characters that represent icons */
           animation: none;
 }
 
+.bouncy {
+  -webkit-animation-duration: 2s;
+          animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-transform-origin: bottom;
+          transform-origin: bottom;
+  -webkit-animation-name: bouncy;
+          animation-name: bouncy;
+  -webkit-animation-timing-function: cubic-bezier(0.28, 0.84, 0.42, 1);
+          animation-timing-function: cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
 @-webkit-keyframes come-in {
   to {
     -webkit-transform: translateY(0);
@@ -3832,6 +3845,68 @@ readers do not read off random characters that represent icons */
   to {
     -webkit-transform: translateY(0);
             transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes bouncy {
+  0% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    -webkit-transform: scale(1.1, 0.9) translateY(0);
+            transform: scale(1.1, 0.9) translateY(0);
+  }
+  30% {
+    -webkit-transform: scale(0.9, 1.1) translateY(-18px);
+            transform: scale(0.9, 1.1) translateY(-18px);
+  }
+  50% {
+    -webkit-transform: scale(1.05, 0.95) translateY(0);
+            transform: scale(1.05, 0.95) translateY(0);
+  }
+  57% {
+    -webkit-transform: scale(1, 1) translateY(-3px);
+            transform: scale(1, 1) translateY(-3px);
+  }
+  64% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
+  }
+}
+
+@keyframes bouncy {
+  0% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    -webkit-transform: scale(1.1, 0.9) translateY(0);
+            transform: scale(1.1, 0.9) translateY(0);
+  }
+  30% {
+    -webkit-transform: scale(0.9, 1.1) translateY(-18px);
+            transform: scale(0.9, 1.1) translateY(-18px);
+  }
+  50% {
+    -webkit-transform: scale(1.05, 0.95) translateY(0);
+            transform: scale(1.05, 0.95) translateY(0);
+  }
+  57% {
+    -webkit-transform: scale(1, 1) translateY(-3px);
+            transform: scale(1, 1) translateY(-3px);
+  }
+  64% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    -webkit-transform: scale(1, 1) translateY(0);
+            transform: scale(1, 1) translateY(0);
   }
 }
 
@@ -15458,8 +15533,8 @@ label.panel-block:hover {
   left: 50%;
   width: 100%;
   max-width: 480px;
-  -webkit-transform: translate(-50%, -100%);
-          transform: translate(-50%, -100%);
+  -webkit-transform: translate(-50%, -200%);
+          transform: translate(-50%, -200%);
 }
 
 .section.store-face {
@@ -15667,6 +15742,28 @@ label.panel-block:hover {
   color: rgba(0, 0, 0, 0.7);
 }
 
+.section.store-face .container.summary .discount-total {
+  position: relative;
+}
+
+.section.store-face .container.summary .discount-total .button {
+  margin-right: 0;
+}
+
+.section.store-face .container.summary .discount-total .button.is-circle {
+  position: absolute;
+  top: 0.65rem;
+  right: -3rem;
+}
+
+.section.store-face .container.summary .discount-total .is-tiny {
+  font-size: 12px;
+}
+
+.section.store-face .container.summary .discount-total * {
+  vertical-align: middle;
+}
+
 @media print {
   .section.store-face .container.summary {
     height: auto;
@@ -15747,6 +15844,11 @@ label.panel-block:hover {
   opacity: 1;
 }
 
+.section.store-face.is-blurred > *:not(#customer-lookup-form):not(#btn-call-member-input) {
+  -webkit-filter: blur(0.5rem);
+          filter: blur(0.5rem);
+}
+
 .modal .message-foot {
   padding: 1rem 2rem;
 }
@@ -15763,6 +15865,11 @@ svg.barcode {
   }
 }
 
+.main {
+  overflow: hidden;
+}
+
+#btn-call-member-input,
 #btn-hold {
   position: absolute;
   right: 24px;
@@ -15775,12 +15882,17 @@ svg.barcode {
   visibility: none;
 }
 
+#btn-call-member-input.is-active,
 #btn-hold.is-active {
   top: 20px;
   opacity: 1;
   -webkit-transform: translateY(0%);
           transform: translateY(0%);
   visibility: visible;
+}
+
+#btn-hold {
+  right: 72px;
 }
 
 #stash {
@@ -15834,6 +15946,7 @@ svg.barcode {
 }
 
 @media print {
+  #btn-call-member-input,
   #btn-hold,
   #stash {
     display: none;
@@ -15867,6 +15980,70 @@ svg.barcode {
   padding-bottom: 2rem;
 }
 
+#customer-lookup-form {
+  position: fixed;
+  right: 24px;
+  -webkit-box-shadow: 0 4px 10px rgba(10, 10, 10, 0.4);
+          box-shadow: 0 4px 10px rgba(10, 10, 10, 0.4);
+  border-radius: 5px;
+  padding: .5rem;
+  background-color: white;
+  z-index: 1;
+  -webkit-transition: all ease-out 0.3s;
+  transition: all ease-out 0.3s;
+  opacity: 0;
+  top: 0;
+  -webkit-transform: translateY(-150%);
+          transform: translateY(-150%);
+  visibility: hidden;
+}
+
+#customer-lookup-form.is-active {
+  visibility: visible;
+  opacity: 1;
+  top: 5rem;
+  -webkit-transform: translateY(0%);
+          transform: translateY(0%);
+}
+
+#customer-lookup-form .input {
+  border-color: #ff3860;
+  outline: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+#customer-lookup-form .customer-details .icon-confirmed {
+  font-size: 24px;
+  color: #23d160;
+}
+
+#coupon-list {
+  position: fixed;
+  bottom: 124px;
+  right: 24px;
+  -webkit-transition: all ease-out .15s;
+  transition: all ease-out .15s;
+  -webkit-transform: translateX(150%);
+          transform: translateX(150%);
+}
+
+#coupon-list.show {
+  -webkit-transform: translateX(0%);
+          transform: translateX(0%);
+}
+
+#coupon-list li .button i {
+  margin-left: 0.25em;
+  -webkit-transform: translateY(1px);
+          transform: translateY(1px);
+  visibility: hidden;
+}
+
+#coupon-list li .button i.is-visible {
+  visibility: visible;
+}
+
 @media print {
   .hide-in-print {
     display: none !important;
@@ -15881,4 +16058,8 @@ svg.barcode {
   .print-only {
     display: block !important;
   }
+}
+
+.button.is-circle {
+  border-radius: 50%;
 }

@@ -20,6 +20,11 @@ small {
     }
 }
 
+.main {
+    overflow: hidden;
+}
+
+#btn-call-member-input,
 #btn-hold {
     position: absolute;
     right: 24px;
@@ -34,6 +39,10 @@ small {
         transform: translateY(0%);
         visibility: visible;
     }
+}
+
+#btn-hold {
+    right: 72px;
 }
 
 #stash {
@@ -79,6 +88,7 @@ small {
     }
 }
 
+#btn-call-member-input,
 #btn-hold,
 #stash {
     @media print {
@@ -105,4 +115,62 @@ small {
 
 #receipt-misc {
     padding-bottom: 2rem;
+}
+
+#customer-lookup-form {
+    position: fixed;
+    right: 24px;
+    box-shadow: 0 4px 10px rgba($black, 0.4);
+    border-radius: 5px;
+    padding: .5rem;
+    background-color: $white;
+    z-index: 1;
+    transition: all ease-out 0.3s;
+    opacity: 0;
+    top: 0;
+    transform: translateY(-150%);
+    visibility: hidden;
+    &.is-active {
+        visibility: visible;
+        opacity: 1;
+        top: 5rem;
+        transform: translateY(0%);
+    }
+
+    .input {
+        border-color: $red;
+        outline: none;
+        box-shadow: none;
+    }
+
+    .customer-details {
+        .icon-confirmed {
+            font-size: 24px;
+            color: $green;
+        }
+    }
+}
+
+#coupon-list {
+    position: fixed;
+    bottom: 124px;
+    right: 24px;
+    transition: all ease-out .15s;
+    transform: translateX(150%);
+    &.show {
+        transform: translateX(0%);
+    }
+
+    li {
+        .button {
+            i {
+                margin-left: 0.25em;
+                transform: translateY(1px);
+                visibility: hidden;
+                &.is-visible {
+                    visibility: visible;
+                }
+            }
+        }
+    }
 }

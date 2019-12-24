@@ -2,18 +2,24 @@
 <div :class="['container summary', extra_classes]">
     <div class="columns is-mobile">
         <div class="column" v-if="!receipt">
-            <button :disabled="cash_disabled" @click.prevent="give_change" :class="['is-outlined button is-large is-warning', {'is-active': payment_method == 'Cash'}]">CASH</button>
-            <button :disabled="eftpos_disabled" @click.prevent="wati_eftpos" :class="['is-outlined button is-large is-primary', {'is-active': payment_method == 'EFTPOS'}]">EFTPOS</button>
+            <template v-if="!is_free">
+                <button :disabled="cash_disabled" @click.prevent="give_change" :class="['is-outlined button is-large is-warning', {'is-active': payment_method == 'Cash'}]">CASH</button>
+                <button :disabled="eftpos_disabled" @click.prevent="wait_eftpos" :class="['is-outlined button is-large is-primary', {'is-active': payment_method == 'EFTPOS'}]">EFTPOS</button>
+            </template>
+            <button v-else :disabled="voucher_disabled" @click.prevent="voucher_payment" :class="['is-outlined button is-large is-danger', {'is-active': payment_method == 'Voucher'}]">VOUCHER</button>
         </div>
         <div class="column" v-else>
             <button class="button is-large is-danger" @click.prevent="do_exit">Exit</button>
             <button class="button is-large is-info is-outlined" @click.prevent="do_print">Print</button>
             <button v-if="payment_method == 'Cash'" class="is-outlined button is-large is-warning is-active">CASH</button>
             <button v-if="payment_method == 'EFTPOS'" class="is-outlined button is-large is-primary is-active">EFTPOS</button>
+            <button v-if="payment_method == 'Voucher'" class="is-outlined button is-large is-danger is-active">VOUCHER</button>
         </div>
         <div class="column has-text-right">
-            <p class="title is-1">
-                <button class=" is-danger button" v-if="discount">{{discount.title}}</button>
+            <p class="title is-1 discount-total">
+                <button @click.prevent="$parent.cancel_discount" class="is-small is-danger button" v-if="discount">{{discount.title}}</button>
+                <span class="is-tiny" v-if="discount">-{{discount.by == '%' ? (discount.rate + '%') : (discount.rate.toDollar())}}</span>
+                <button v-if="$parent.coupons.length" @click.prevent="check_coupons" :class="['button is-danger is-circle', {'bouncy': !coupons_clicked}]"><span class="icon"><i v-if="!$parent.coupons_shown" class="fas fa-gift"></i><i class="fas fa-times" v-else></i></span></button>
                 {{total_amount}}
             </p>
             <p class="subtitle is-7">
@@ -31,15 +37,26 @@ export default {
     props       :   ['total', 'discount', 'extra_classes', 'receipt'],
     data() {
         return {
-            cash_loading    :   false,
-            eftpos_loading  :   false,
-            cash_disabled   :   false,
-            eftpos_disabled :   false,
-            payment_method  :   null,
-            cash_taken      :   null
+            coupons_clicked     :   false,
+            cash_loading        :   false,
+            eftpos_loading      :   false,
+            voucher_loading     :   false,
+            cash_disabled       :   false,
+            eftpos_disabled     :   false,
+            voucher_disabled    :   false,
+            payment_method      :   null,
+            cash_taken          :   null
         }
     },
     watch       :   {
+        discount(nv, ov)
+        {
+            if (nv) {
+
+            } else {
+
+            }
+        },
         receipt(nv, ov) {
             if (nv) {
                 this.cash_taken =   this.receipt.cash;
@@ -62,8 +79,39 @@ export default {
             change      =   change > 0 ? change : 0;
             return change.toDollar();
         },
+        is_free()
+        {
+            if (this.total) {
+                let total   =   this.total;
+
+                if (this.discount) {
+                    if (this.discount.by == '%') {
+                        total   =   total * (1 - this.discount.rate * 0.01);
+                    } else {
+                        total   =   total - this.discount.rate;
+                    }
+                }
+
+                return total <= 0;
+            }
+
+            return false;
+        },
         total_amount() {
             if (this.total) {
+                let sum =   this.total;
+                if (this.discount) {
+                    if (this.discount.by == '%') {
+                        sum     =   (sum * (1 - this.discount.rate * 0.01));
+                        sum     =   sum < 0 ? 0 : sum;
+                        return sum.toDollar();
+                    } else {
+                        sum     =   (sum - this.discount.rate);
+                        sum     =   sum < 0 ? 0 : sum;
+                        return sum.toDollar();
+                    }
+                }
+
                 return this.total.toDollar();
             }
 
@@ -71,19 +119,38 @@ export default {
         },
         gst() {
             if (this.total) {
-                return (this.total * 0.15 / 1.15).toDollar();
+                let total   =   this.total;
+
+                if (this.discount) {
+                    if (this.discount.by == '%') {
+                        total   =   total * (1 - this.discount.rate * 0.01);
+                    } else {
+                        total   =   total - this.discount.rate;
+                    }
+                }
+
+                total   =   total < 0 ? 0 : total;
+
+                return (total * 0.15 / 1.15).toDollar();
             }
 
             return '$0.00';
         }
     },
     methods     :   {
+        check_coupons()
+        {
+            this.coupons_clicked    =   true;
+            this.$parent.toggle_coupons();
+        },
         do_exit() {
             let me  =   this;
             me.cash_loading     =   false;
             me.eftpos_loading   =   false;
+            me.voucher_loading  =   false;
             me.cash_disabled    =   false;
             me.eftpos_disabled  =   false;
+            me.voucher_disabled =   false;
             me.payment_method   =   null;
             me.$router.replace('/');
             me.$parent.reset();
@@ -94,20 +161,30 @@ export default {
         },
         give_change() {
             this.payment_method =   'Cash';
-            this.$bus.$emit('giveChange', this.total, this.place_order);
+            this.$bus.$emit('giveChange', this.total_amount, this.place_order);
         },
-        wati_eftpos() {
+        wait_eftpos() {
             this.payment_method =   'EFTPOS';
-            this.$bus.$emit('waitEFTPOS', this.total, this.place_order);
+            this.$bus.$emit('waitEFTPOS', this.total_amount, this.place_order);
+        },
+        voucher_payment()
+        {
+            this.place_order('Voucher');
         },
         place_order(by, amount_taken) {
-            if (this.cash_loading || this.eftpos_loading) return false;
+            if (this.cash_loading || this.eftpos_loading || this.voucher_loading) return false;
 
             if (by == 'EFTPOS') {
                 this.eftpos_loading     =   true;
                 this.cash_disabled      =   true;
-            } else {
+                this.voucher_disabled   =   true;
+            } else if (by == 'Cash'){
                 this.cash_loading       =   true;
+                this.eftpos_disabled    =   true;
+                this.voucher_disabled   =   true;
+            } else {
+                this.voucher_loading    =   true;
+                this.cash_disabled      =   true;
                 this.eftpos_disabled    =   true;
             }
 
@@ -121,7 +198,14 @@ export default {
                 params.append('cash_taken', this.cash_taken);
             }
 
-            if (this.discount) {
+            if (this.$parent.customer) {
+                params.append('customer', this.$parent.customer.id);
+                if (this.$parent.coupon) {
+                    params.append('coupon', this.$parent.coupon.id);
+                }
+            }
+
+            if (this.discount && !this.$parent.coupon) {
                 params.append('discount', this.discount.id);
             }
 
@@ -141,6 +225,7 @@ export default {
                 me.eftpos_loading   =   false;
                 me.cash_disabled    =   false;
                 me.eftpos_disabled  =   false;
+                me.voucher_disabled =   false;
                 me.payment_method   =   null;
                 me.cash_taken       =   null;
                 if (error.response && error.response.data && error.response.data.message) {
@@ -154,8 +239,10 @@ export default {
             me.eftpos_loading   =   false;
             me.cash_disabled    =   false;
             me.eftpos_disabled  =   false;
+            me.voucher_disabled =   false;
             me.payment_method   =   null;
             me.cash_taken       =   null;
+            me.coupons_clicked  =   false;
             me.$router.replace('/');
             me.$parent.reset();
         },
@@ -166,8 +253,10 @@ export default {
                 me.eftpos_loading   =   false;
                 me.cash_disabled    =   false;
                 me.eftpos_disabled  =   false;
+                me.voucher_disabled =   false;
                 me.payment_method   =   null;
                 me.cash_taken       =   null;
+                me.coupons_clicked  =   false;
                 me.$router.replace('/');
                 me.$parent.reset();
             });

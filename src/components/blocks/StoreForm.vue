@@ -3,7 +3,7 @@
     <div class="field has-addons">
         <div class="control is-expanded">
             <div class="text is-fullwidth">
-                <input autocomplete="off" id="lookup" type="text" class="input is-small" v-model="input" />
+                <input autocomplete="off" ref="lookup_input" id="lookup" @blur="refocus" @keydown="keydown_handler" type="text" class="input is-small" v-model="input" />
             </div>
         </div>
         <div class="control">
@@ -68,27 +68,29 @@ export default {
                 }
             });
         },
-        focusing() {
-            let me  =   this;
-            $(this.$el).find('.input').blur(function(e)
-            {
-                if (can_query) {
-                    $(this).focus();
-                }
-            }).keydown(function(e)
-            {
-                if (e.keyCode == 27) {
-                    me.input    =   null;
-                }
-            }).focus();
+        keydown_handler(e)
+        {
+            if (e.keyCode == 27) {
+                this.input    =   null;
+            }
+        },
+        refocus(e)
+        {
+            if (can_query) {
+                this.focusing();
+            }
+        },
+        focusing()
+        {
+            $(this.$refs.lookup_input).focus();
         }
     },
     created() {
-        let me  =   true;
+        let me  =   this;
         $(window).on('focus', function(e)
         {
             if (can_query) {
-                $('#lookup').focus();
+                me.focusing();
             }
         });
 
@@ -99,7 +101,9 @@ export default {
     },
     mounted() {
         can_query   =   true;
-        this.focusing();
+        this.$nextTick().then(() => {
+            this.focusing();
+        });
     }
 }
 </script>

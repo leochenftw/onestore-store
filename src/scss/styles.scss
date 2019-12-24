@@ -31,3 +31,11 @@ $family-primary: source-han-sans-simplified-c, Helvetica, Arial, sans-serif;
         display: block !important;
     }
 }
+
+.button {
+    &.is {
+        &-circle {
+            border-radius: 50%;
+        }
+    }
+}
