@@ -15752,8 +15752,8 @@ label.panel-block:hover {
 
 .section.store-face .container.summary .discount-total .button.is-circle {
   position: absolute;
-  top: 0.65rem;
-  right: -3rem;
+  top: -1rem;
+  right: -1rem;
 }
 
 .section.store-face .container.summary .discount-total .is-tiny {
