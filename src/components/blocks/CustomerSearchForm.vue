@@ -34,7 +34,7 @@ export default {
     {
         return {
             is_loading  :   false,
-            phone       :   '02108438078',
+            phone       :   null,
             error_msg   :   null,
             customer    :   null,
             coupons     :   []
