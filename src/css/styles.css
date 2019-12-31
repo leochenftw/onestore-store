@@ -15624,18 +15624,6 @@ label.panel-block:hover {
   }
 }
 
-@media print {
-  .section.store-face .container.cart-items .table {
-    display: block;
-  }
-}
-
-@media print {
-  .section.store-face .container.cart-items .table tbody {
-    display: block;
-  }
-}
-
 .section.store-face .container.cart-items .table tr th {
   font-size: 16px;
   font-weight: normal;
@@ -15760,6 +15748,12 @@ label.panel-block:hover {
   font-size: 12px;
 }
 
+@media print {
+  .section.store-face .container.summary .discount-total .is-tiny {
+    font-weight: normal;
+  }
+}
+
 .section.store-face .container.summary .discount-total * {
   vertical-align: middle;
 }
@@ -15809,8 +15803,6 @@ label.panel-block:hover {
     display: -ms-inline-flexbox;
     display: inline-flex;
     font-size: 12px;
-    -webkit-transform: translateY(10px);
-            transform: translateY(10px);
   }
   .section.store-face .container.summary .columns .column .subtitle {
     color: #000;
@@ -16019,18 +16011,30 @@ svg.barcode {
 }
 
 #coupon-list {
-  position: fixed;
-  bottom: 124px;
-  right: 24px;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 0;
   -webkit-transition: all ease-out .15s;
   transition: all ease-out .15s;
   -webkit-transform: translateX(150%);
           transform: translateX(150%);
+  opacity: 0;
+  visibility: hidden;
 }
 
 #coupon-list.show {
   -webkit-transform: translateX(0%);
           transform: translateX(0%);
+  opacity: 1;
+  visibility: visible;
+}
+
+#coupon-list li {
+  text-align: right;
+}
+
+#coupon-list li:not(:last-child) {
+  margin-bottom: .5rem;
 }
 
 #coupon-list li .button i {

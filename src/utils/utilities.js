@@ -32,6 +32,7 @@ Number.prototype.toDollar = function toDollar(digits) {
     let n           =   this,
         minus_mark  =   n < 0 ? '-' : '';
     digits = (digits === null || digits === undefined) ? 2 : digits;
+    n = Math.round(n * 100) / 100;
     return minus_mark + '$' + Math.abs(n).toFixed(digits).kmark();
 };
 

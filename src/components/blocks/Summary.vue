@@ -19,8 +19,8 @@
             <p class="title is-1 discount-total">
                 <button @click.prevent="$parent.cancel_discount" class="is-small is-danger button" v-if="discount">{{discount.title}}</button>
                 <span class="is-tiny" v-if="discount">-{{discount.by == '%' ? (discount.rate + '%') : (discount.rate.toDollar())}}</span>
-                <button v-if="$parent.coupons.length" @click.prevent="check_coupons" :class="['button is-danger is-circle', {'bouncy': !coupons_clicked}]"><span class="icon"><i v-if="!$parent.coupons_shown" class="fas fa-gift"></i><i class="fas fa-times" v-else></i></span></button>
-                {{total_amount}}
+                <button v-if="$parent.coupons.length" @click.prevent="check_coupons" :class="['hide-in-print button is-danger is-circle', {'bouncy': !coupons_clicked}]"><span class="icon"><i v-if="!$parent.coupons_shown" class="fas fa-gift"></i><i class="fas fa-times" v-else></i></span></button>
+                {{total_amount.toDollar()}}
             </p>
             <p class="subtitle is-7">
                 incl. GST {{gst}}
@@ -104,37 +104,21 @@ export default {
                     if (this.discount.by == '%') {
                         sum     =   (sum * (1 - this.discount.rate * 0.01));
                         sum     =   sum < 0 ? 0 : sum;
-                        return sum.toDollar();
                     } else {
                         sum     =   (sum - this.discount.rate);
                         sum     =   sum < 0 ? 0 : sum;
-                        return sum.toDollar();
                     }
+
+                    return sum;
                 }
 
-                return this.total.toDollar();
+                return this.total;
             }
 
-            return '$0.00';
+            return 0;
         },
         gst() {
-            if (this.total) {
-                let total   =   this.total;
-
-                if (this.discount) {
-                    if (this.discount.by == '%') {
-                        total   =   total * (1 - this.discount.rate * 0.01);
-                    } else {
-                        total   =   total - this.discount.rate;
-                    }
-                }
-
-                total   =   total < 0 ? 0 : total;
-
-                return (total * 0.15 / 1.15).toDollar();
-            }
-
-            return '$0.00';
+            return (this.total_amount * 0.15 / 1.15).toDollar();
         }
     },
     methods     :   {
@@ -243,7 +227,9 @@ export default {
             me.payment_method   =   null;
             me.cash_taken       =   null;
             me.coupons_clicked  =   false;
-            me.$router.replace('/');
+            if (me.$route.name != 'Homepage') {
+                me.$router.replace('/');
+            }
             me.$parent.reset();
         },
         reset() {
@@ -257,7 +243,9 @@ export default {
                 me.payment_method   =   null;
                 me.cash_taken       =   null;
                 me.coupons_clicked  =   false;
-                me.$router.replace('/');
+                if (me.$route.name != 'Homepage') {
+                    me.$router.replace('/');
+                }
                 me.$parent.reset();
             });
         }

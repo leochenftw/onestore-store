@@ -45,19 +45,27 @@
         </table>
     </div>
 
-    <ul id="coupon-list" v-if="coupons.length" :class="{'show': coupons_shown}">
-        <li v-for="item in coupons">
-            <button @click.prevent="create_virtual_discount(item, $event)" class="button is-danger">
-                {{item.title}}
-                <i :class="['far fa-check-circle', {'is-visible': (coupon && coupon.id == item.id)}]"></i>
-            </button>
-        </li>
-    </ul>
+    <div class="container">
+        <ul id="coupon-list" v-if="coupons.length" :class="{'show': coupons_shown}">
+            <li v-for="item in coupons">
+                <button @click.prevent="create_virtual_discount(item, $event)" class="button is-danger">
+                    {{item.title}}
+                    <i :class="['far fa-check-circle', {'is-visible': (coupon && coupon.id == item.id)}]"></i>
+                </button>
+            </li>
+        </ul>
+    </div>
 
     <div id="receipt-misc" v-if="receipt">
         <p><strong>NOTE: </strong>ALL PRICES ARE GST INCLUSIVE</p>
         <p><strong>Operator: </strong>{{receipt.by}}</p>
         <p><strong>Paid at: </strong><span id="paid-at">{{receipt.at}}</span></p>
+        <template v-if="receipt.customer">
+        <br />
+        <p><strong>Customer: </strong>{{receipt.customer.first_name}} {{receipt.customer.surname}}</p>
+        <p><strong>Phone: </strong>{{receipt.customer.phone}}</p>
+        <p><strong>Credit: </strong>{{receipt.customer.shop_points.kmark()}} (as at {{receipt.at}})</p>
+        </template>
     </div>
     <Summary :receipt="receipt" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />

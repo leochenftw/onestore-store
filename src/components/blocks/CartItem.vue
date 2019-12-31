@@ -5,9 +5,21 @@
         <em v-if="source.refund" style="font-size: 14px; display: block;"><small>refund item</small></em>
         <span class="has-text-danger" v-if="!source.discountable && show_discountable" style="font-size: 14px; display: block;"><small>- not discountable -</small></span>
     </td>
-    <td style="width: 15%;" class="col-price has-text-centered">{{source.unit_price.toDollar()}}</td>
+    <td style="width: 15%;" class="col-price has-text-centered">
+        <input
+            ref="price_fixer"
+            @dblclick.prevent="fixing_price"
+            @blur="blur"
+            @keydown="keydown"
+            type="number"
+            v-model="source.unit_price"
+            class="input has-text-centered"
+            :readonly="!custom_price"
+        />
+    </td>
     <td style="width: 12%;" class="col-qty has-text-centered">
         <input
+            ref="qty_fixer"
             @dblclick.prevent="dblclick"
             @blur="blur"
             @keydown="keydown"
@@ -39,6 +51,7 @@ export default
     props       :   ['source', 'show_discountable', 'is_viewing'],
     data() {
         return {
+            custom_price    :   false,
             can_edit        :   false,
             show_options    :   false
         }
@@ -72,17 +85,24 @@ export default
             }
         },
         blur() {
-            can_query       =   true;
-            this.can_edit   =   false;
+            can_query           =   true;
+            this.can_edit       =   false;
+            this.custom_price   =   false;
             $('#lookup').focus();
             if (this.source.quantity <= 0) {
                 this.$parent.remove_item(this.source.id);
             }
         },
         dblclick() {
-            can_query       =   false;
-            this.can_edit   =   true;
-            $(this.$el).find('.input').focus().select();
+            can_query           =   false;
+            this.can_edit       =   true;
+            $(this.$refs.qty_fixer).focus().select();
+        },
+        fixing_price(e)
+        {
+            can_query           =   false;
+            this.custom_price   =   true;
+            $(this.$refs.price_fixer).focus().select();
         }
     }
 }

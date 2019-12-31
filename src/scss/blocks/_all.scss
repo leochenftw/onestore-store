@@ -152,16 +152,25 @@ small {
 }
 
 #coupon-list {
-    position: fixed;
-    bottom: 124px;
-    right: 24px;
+    position: absolute;
+    bottom: 1.5rem;
+    right: 0;
     transition: all ease-out .15s;
     transform: translateX(150%);
+    opacity: 0;
+    visibility: hidden;
+
     &.show {
         transform: translateX(0%);
+        opacity: 1;
+        visibility: visible;
     }
 
     li {
+        text-align: right;
+        &:not(:last-child) {
+            margin-bottom: .5rem;
+        }
         .button {
             i {
                 margin-left: 0.25em;

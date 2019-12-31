@@ -57,15 +57,6 @@
                 padding-bottom: 2rem;
             }
             .table {
-                @media print {
-                    display: block;
-                }
-
-                tbody {
-                    @media print {
-                        display: block;
-                    }
-                }
                 tr {
                     th {
                         font-size: 16px;
@@ -182,6 +173,9 @@
 
                 .is-tiny {
                     font-size: 12px;
+                    @media print {
+                        font-weight: normal;
+                    }
                 }
 
                 * {
@@ -222,7 +216,6 @@
                             .button {
                                 display: inline-flex;
                                 font-size: 12px;
-                                transform: translateY(10px);
                             }
                         }
 
