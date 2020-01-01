@@ -23,6 +23,10 @@ $family-primary: source-han-sans-simplified-c, Helvetica, Arial, sans-serif;
     .hide-in-print {
         display: none !important;
     }
+
+    .input, .textarea, .select select {
+        color: #000 !important;
+    }
 }
 
 .print-only {

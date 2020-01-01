@@ -16052,6 +16052,9 @@ svg.barcode {
   .hide-in-print {
     display: none !important;
   }
+  .input, .textarea, .select select {
+    color: #000 !important;
+  }
 }
 
 .print-only {
