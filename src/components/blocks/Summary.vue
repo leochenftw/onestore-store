@@ -81,7 +81,7 @@ export default {
         },
         is_free()
         {
-            if (this.total) {
+            if (this.total && this.$parent.coupon) {
                 let total   =   this.total;
 
                 if (this.discount) {
