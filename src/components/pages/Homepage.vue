@@ -2,7 +2,7 @@
 <div :class="['section store-face', {'has-goods' : goods.length > 0}, {'is-blurred': clookup_activated}]">
     <h1 class="title is-marginless">
         <img :class="['icon', {'is-loading': is_loading}]" src="@/assets/icon-coin.svg" />
-        <img :src="logo" class="logo" alt="Store face" />
+        <img @click.prevent="focus_input" :src="logo" class="logo" alt="Store face" />
         <div id="store-info" class="has-text-right" v-if="store_info">
             <p v-if="store_info.title">{{store_info.title}}</p>
             <p v-if="store_info.gst">GST: {{store_info.gst}}</p>
@@ -116,6 +116,10 @@ export default {
         }
     },
     methods     :   {
+        focus_input()
+        {
+            $('#lookup').focus();
+        },
         toggle_customer_lookup(e)
         {
             can_query               =   !can_query;
