@@ -20,9 +20,11 @@
 </template>
 
 <script>
+import DoubleTab from '../mixins/DoubleTab';
 export default
 {
     name        :   'EftposPauser',
+    mixins      :   [DoubleTab],
     data() {
         return {
             show        :   false,
@@ -54,10 +56,7 @@ export default
             can_query       =   false;
             $('#lookup').blur();
             this.$nextTick().then(() => {
-                $('#change-giver').blur(function(e)
-                {
-                    $(this).focus();
-                }).focus();
+                this.mount_listener();
             });
         },
         do_callback() {
@@ -67,7 +66,7 @@ export default
             this.close();
         },
         close() {
-            $('#change-giver').unbind('blur');
+            this.dismount_listener();
             $(window).unbind('keydown', this.keydownhandler);
             this.show       =   false;
             this.topay      =   0;
