@@ -40,7 +40,13 @@
                 </tr>
             </thead>
             <tbody>
-                <CartItem :is_viewing="view_mode" :source="item" :show_discountable="discount" :key="i" v-for="(item, i) in goods" />
+                <CartItem
+                    :is_viewing="view_mode"
+                    :source="item"
+                    :show_discountable="discount"
+                    :show_pointable="customer ? true : false"
+                    :key="i" v-for="(item, i) in goods"
+                />
             </tbody>
         </table>
     </div>

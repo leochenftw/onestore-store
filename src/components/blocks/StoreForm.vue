@@ -1,5 +1,5 @@
 <template>
-<form class="form store-form" method="post" @submit="submit">
+<form :class="['form store-form', {'come-down': input && input.trim().length}]" method="post" @submit="submit">
     <div class="field has-addons">
         <div class="control is-expanded">
             <div class="text is-fullwidth">

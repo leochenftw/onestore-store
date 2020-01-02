@@ -15535,6 +15535,18 @@ label.panel-block:hover {
   max-width: 480px;
   -webkit-transform: translate(-50%, -200%);
           transform: translate(-50%, -200%);
+  -webkit-transition: all ease-out 0.1s;
+  transition: all ease-out 0.1s;
+  z-index: 9;
+}
+
+.form.store-form.come-down {
+  -webkit-transition-delay: 1s;
+          transition-delay: 1s;
+  -webkit-transition-duration: 0.3s;
+          transition-duration: 0.3s;
+  -webkit-transform: translate(-50%, 120%);
+          transform: translate(-50%, 120%);
 }
 
 .section.store-face {

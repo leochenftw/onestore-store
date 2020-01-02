@@ -6,4 +6,11 @@
     width: 100%;
     max-width: 480px;
     transform: translate(-50%, -200%);
+    transition: all ease-out 0.1s;
+    z-index: 9;
+    &.come-down {
+        transition-delay: 1s;
+        transition-duration: 0.3s;
+        transform: translate(-50%, 120%);
+    }
 }

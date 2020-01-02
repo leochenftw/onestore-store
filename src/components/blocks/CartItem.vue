@@ -4,6 +4,7 @@
         {{source.title}}
         <em v-if="source.refund" style="font-size: 14px; display: block;"><small>refund item</small></em>
         <span class="has-text-danger" v-if="!source.discountable && show_discountable" style="font-size: 14px; display: block;"><small>- not discountable -</small></span>
+        <span class="has-text-danger" v-if="source.no_point && show_pointable" style="font-size: 14px; display: block;"><small>- item contributes no ShopPoints -</small></span>
     </td>
     <td style="width: 15%;" class="col-price has-text-centered">
         <input
@@ -48,7 +49,7 @@
 export default
 {
     name        :   'CartItem',
-    props       :   ['source', 'show_discountable', 'is_viewing'],
+    props       :   ['source', 'show_discountable', 'show_pointable', 'is_viewing'],
     data() {
         return {
             custom_price    :   false,
