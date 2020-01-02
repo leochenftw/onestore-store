@@ -24,7 +24,7 @@
             </p>
             <p class="subtitle is-7">
                 incl. GST {{gst}}
-                <template v-if="cash_taken"><br />Received {{cash_taken.toDollar()}} cash; Given {{given_change}} change</template>
+                <template v-if="cash_taken"><br />Received {{cash_taken.toDollar()}} cash; Given <span class="outstanding">{{given_change}}</span> change</template>
             </p>
         </div>
     </div>

@@ -140,6 +140,12 @@
                 opacity: 1;
                 transform: perspective(1000px) rotate3d(1, 0, 0, 0deg);
             }
+
+            .outstanding {
+                font-size: 1rem;
+                text-decoration: underline;
+            }
+
             .button {
                 &:first-child {
                     margin-right: 1em;

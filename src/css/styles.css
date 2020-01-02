@@ -15726,6 +15726,11 @@ label.panel-block:hover {
           transform: perspective(1000px) rotate3d(1, 0, 0, 0deg);
 }
 
+.section.store-face .container.summary .outstanding {
+  font-size: 1rem;
+  text-decoration: underline;
+}
+
 .section.store-face .container.summary .button:first-child {
   margin-right: 1em;
 }
