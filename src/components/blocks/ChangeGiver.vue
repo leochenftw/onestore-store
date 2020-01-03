@@ -27,9 +27,11 @@
 </template>
 
 <script>
+import DoubleTab from '../mixins/DoubleTab';
 export default
 {
     name        :   'ChangeGiver',
+    mixins      :   [DoubleTab],
     data() {
         return {
             show        :   false,
@@ -70,6 +72,7 @@ export default
             can_query       =   false;
             $('#lookup').blur();
             this.$nextTick().then(() => {
+                this.mount_listener();
                 $('#change-giver').blur(function(e)
                 {
                     $(this).focus();
@@ -84,6 +87,7 @@ export default
         },
         close() {
             $('#change-giver').unbind('blur');
+            this.dismount_listener();
             $(window).unbind('keydown', this.keydownhandler);
             this.show       =   false;
             this.topay      =   0;
