@@ -34,7 +34,7 @@
 <script>
 export default {
     name        :   'Summary',
-    props       :   ['total', 'discount', 'extra_classes', 'receipt'],
+    props       :   ['total', 'nondis_total', 'discount', 'extra_classes', 'receipt'],
     data() {
         return {
             coupons_clicked     :   false,
@@ -92,6 +92,10 @@ export default {
                     }
                 }
 
+                total   =   total < 0 ? 0 : total;
+
+                total   +=  (this.nondis_total ? this.nondis_total : 0);
+
                 return total <= 0;
             }
 
@@ -109,13 +113,13 @@ export default {
                         sum     =   sum < 0 ? 0 : sum;
                     }
 
-                    return sum;
+                    return sum + this.nondis_total;
                 }
 
-                return this.total;
+                return this.total + this.nondis_total;
             }
 
-            return 0;
+            return this.nondis_total ? this.nondis_total : 0;
         },
         gst() {
             return (this.total_amount * 0.15 / 1.15).toDollar();

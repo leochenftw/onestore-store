@@ -34,7 +34,7 @@ export default {
     {
         return {
             is_loading  :   false,
-            phone       :   null,
+            phone       :   location.hostname == 'localhost' ? '02108438078' : null,
             error_msg   :   null,
             customer    :   null,
             coupons     :   []

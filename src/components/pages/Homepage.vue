@@ -73,7 +73,7 @@
         <p><strong>Credit: </strong>{{receipt.customer.shop_points.kmark()}} (as at {{receipt.at}})</p>
         </template>
     </div>
-    <Summary :receipt="receipt" :total="sum" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
+    <Summary :receipt="receipt" :total="sum_discountable" :nondis_total="sum_nondiscountable" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />
     <EftposPauser />
     <Barcode v-if="receipt" :barcode="receipt.barcode" />
@@ -118,6 +118,11 @@ export default {
                 this.coupons        =   [];
                 this.coupon         =   null;
                 this.coupons_shown  =   false;
+            } else {
+                if (this.discount && this.coupon && this.whole_cart_not_discountable()) {
+                    this.coupon     =   null;
+                    this.discount   =   null;
+                }
             }
         }
     },
@@ -254,8 +259,27 @@ export default {
                 this.coupons_shown  =   !this.coupons_shown;
             }
         },
+        whole_cart_not_discountable()
+        {
+            let result  =   true;
+
+            for (let i = 0; i < this.goods.length; i++) {
+                if (this.goods[i].discountable) {
+                    result  =   false;
+                    break;
+                }
+            }
+
+            return result;
+        },
         create_virtual_discount(coupon, e)
         {
+            if (this.whole_cart_not_discountable()) {
+                alert('There is no discountable items in this cart!');
+                this.toggle_coupons();
+                return false;
+            }
+
             this.coupon     =   coupon;
             this.discount   =   {
                 id: coupon.id,
@@ -280,9 +304,24 @@ export default {
     },
     computed    :   {
         sum() {
+            return this.sum_discountable + this.sum_nondiscountable;
+        },
+        sum_nondiscountable()
+        {
+            let amount          =   0;
+
+            this.goods.forEach((o) => {
+                if (!o.discountable) {
+                    amount +=  (o.quantity * o.unit_price * (o.refund ? -1 : 1));
+                }
+            });
+
+            return amount;
+        },
+        sum_discountable()
+        {
             let amount          =   0,
-                factor          =   1,
-                nondiscountable =   0;
+                factor          =   1;
 
             if (this.discount && this.discount.type == 'byPercentage') {
                 factor  -=  (this.discount.value * 0.01);
@@ -291,8 +330,6 @@ export default {
             this.goods.forEach((o) => {
                 if (o.discountable) {
                     amount          +=  (o.quantity * o.unit_price * factor * (o.refund ? -1 : 1));
-                } else {
-                    nondiscountable +=  (o.quantity * o.unit_price * (o.refund ? -1 : 1));
                 }
             });
 
@@ -301,7 +338,7 @@ export default {
                 amount  =   amount < 0 ? 0 : amount;
             }
 
-            return amount + nondiscountable;
+            return amount;
         }
     }
 }

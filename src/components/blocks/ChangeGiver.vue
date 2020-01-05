@@ -80,6 +80,8 @@ export default
             });
         },
         do_callback() {
+            if (!this.amount) return false;
+            if (this.amount < this.topay) return false;
             if (this.callback) {
                 this.callback('Cash', this.amount);
             }
