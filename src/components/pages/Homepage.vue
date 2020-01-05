@@ -172,7 +172,8 @@ export default {
                     unit_price      :   product.price,
                     quantity        :   product.quantity ? product.quantity : 1,
                     refund          :   product.refund ? parseInt(product.refund) : parseInt(product.refund),
-                    discountable    :   product.discountable
+                    discountable    :   product.discountable,
+                    no_point        :   product.no_point
                 });
             }
         },
