@@ -75,7 +75,8 @@ export default {
     computed    :   {
         given_change() {
             let amount  =   this.cash_taken ? this.cash_taken.toFloat() : 0,
-                change  =   amount - (Math.round(this.total * 10) * 0.1);
+                nondis  =   this.nondis_total ? this.nondis_total : 0,
+                change  =   amount - (Math.round((this.total + nondis) * 10) * 0.1);
             change      =   change > 0 ? change : 0;
             return change.toDollar();
         },
