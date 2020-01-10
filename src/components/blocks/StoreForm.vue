@@ -28,6 +28,13 @@ export default {
                 e.preventDefault();
             }
             if (!this.input) return false;
+
+            if (this.input == 'REFUND') {
+                this.$parent.is_refunding   =   true;
+                this.input  =   null;
+                return;
+            }
+
             if (this.input == 'signout') {
                 let me      =   this;
                 axios.post(
@@ -38,6 +45,19 @@ export default {
 
                 this.input  =   null;
                 return;
+            }
+
+            if (this.$parent.is_refunding) {
+                if (this.input.indexOf('RECEIPT-') > -1) {
+                    this.input  =   null;
+                    return false;
+                }
+
+                if (this.input.indexOf('DCNT-') > -1) {
+                    this.$bus.$emit('showMessage', 'You cannot add discounts during refund process!', 'danger');
+                    this.input  =   null;
+                    return false;
+                }
             }
 
             if (this.is_loading) return false;

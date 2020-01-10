@@ -2,7 +2,7 @@
 <tr :class="['cart-item', {'has-text-danger' : source.refund}]">
     <td class="col-title">
         {{source.title}}
-        <em v-if="source.refund" style="font-size: 14px; display: block;"><small>refund item</small></em>
+        <em v-if="source.refund" style="font-size: 14px; display: block;"><small v-if="source.ordered">already refunded</small><small v-else>refund item</small></em>
         <span class="has-text-danger" v-if="!source.discountable && show_discountable" style="font-size: 14px; display: block;"><small>- not discountable -</small></span>
         <span class="has-text-danger" v-if="source.no_point && show_pointable" style="font-size: 14px; display: block;"><small>- item contributes no ShopPoints -</small></span>
     </td>
@@ -78,7 +78,8 @@ export default
         },
         remove() {
             this.show_options   =   false;
-            this.$parent.remove_item(this.source.id);
+            console.log(this.source);
+            this.$parent.remove_item(this.source.id, this.source.ordered, this.source.refund);
         },
         keydown(e) {
             if (e.keyCode == 27 || e.keyCode == 13) {
@@ -91,10 +92,17 @@ export default
             this.custom_price   =   false;
             $('#lookup').focus();
             if (this.source.quantity <= 0) {
-                this.$parent.remove_item(this.source.id);
+                this.$parent.remove_item(this.source.id, this.source.ordered, this.source.refund);
+            } else if (this.$parent.is_refunding && !this.source.ordered) {
+                this.$parent.check_qty(this.source);
             }
         },
         dblclick() {
+            if (this.$parent.is_refunding && this.source.ordered) {
+                this.$bus.$emit('showMessage', 'You cannot edit this quantity!');
+                return false;
+            }
+
             can_query           =   false;
             this.can_edit       =   true;
             $(this.$refs.qty_fixer).focus().select();

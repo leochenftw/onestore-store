@@ -24,10 +24,15 @@
     </div>
     <button v-if="!view_mode" @click.prevent="put_onhold" id="btn-hold" :class="['button is-outlined is-danger', {'is-active': goods.length > 0}]"><span class="icon"><i class="far fa-hand-paper"></i></span></button>
 
+    <div v-if="view_mode && !is_refunding" id="top-float-menu" :class="['hide-in-print', {'is-active': goods.length > 0}]">
+        <button class="button is-small is-info is-outlined" @click.prevent="do_print">Print</button>
+        <button class="button is-small is-info is-outlined is-danger" @click.prevent="is_refunding = true;">Refund</button>
+    </div>
+
     <button v-if="!view_mode" @click.prevent="toggle_customer_lookup" id="btn-call-member-input" :class="['button is-danger', {'is-active': goods.length > 0}, {'is-outlined': !clookup_activated}]"><span class="icon" v-if="customer">{{customer.first_name[0]}}</span><span class="icon" v-else><i class="fas fa-user"></i></span></button>
 
     <CustomerSearchForm :is_active="clookup_activated" v-if="!view_mode" />
-    <StoreForm ref="storeform" v-if="!view_mode" />
+    <StoreForm ref="storeform" v-if="!view_mode || is_refunding" />
     <div class="container cart-items">
         <table class="table is-fullwidth">
             <thead>
@@ -44,7 +49,7 @@
                     :is_viewing="view_mode"
                     :source="item"
                     :show_discountable="discount"
-                    :show_pointable="customer ? true : false"
+                    :show_pointable="receipt ? (receipt.customer ? true : false) :(customer ? true : false)"
                     :key="i" v-for="(item, i) in goods"
                 />
             </tbody>
@@ -73,7 +78,7 @@
         <p><strong>Credit: </strong>{{receipt.customer.shop_points.kmark()}} (as at {{receipt.at}})</p>
         </template>
     </div>
-    <Summary :receipt="receipt" :total="sum_discountable" :nondis_total="sum_nondiscountable" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
+    <Summary ref="summary_stripe" :receipt="receipt" :total="sum_discountable" :refund_total="refund_amount" :nondis_total="sum_nondiscountable" :discount="discount" :extra_classes="goods.length > 0 ? 'stand-up' : null" />
     <ChangeGiver />
     <EftposPauser />
     <Barcode v-if="receipt" :barcode="receipt.barcode" />
@@ -95,6 +100,7 @@ export default {
     components : {StoreForm, CartItem, Summary, ChangeGiver, EftposPauser, Barcode, CustomerSearchForm},
     data() {
         return {
+            is_refunding        :   false,
             view_mode           :   false,
             store_info          :   store_info,
             logo                :   logo,
@@ -118,6 +124,12 @@ export default {
                 this.coupons        =   [];
                 this.coupon         =   null;
                 this.coupons_shown  =   false;
+                this.is_refunding   =   false;
+                this.view_mode      =   false;
+                this.receipt        =   null;
+                if (this.$route.query.receipt || this.$route.query.refund) {
+                    this.$router.replace({name: 'Homepage'});
+                }
             } else {
                 if (this.discount && this.coupon && this.whole_cart_not_discountable()) {
                     this.coupon     =   null;
@@ -127,6 +139,10 @@ export default {
         }
     },
     methods     :   {
+        do_print() {
+            window.print();
+            this.$refs.summary_stripe.slient_reset();
+        },
         focus_input()
         {
             $('#lookup').focus();
@@ -166,24 +182,79 @@ export default {
                 }
             }
         },
+        check_qty(refund_item)
+        {
+            let refunding_item  =   this.goods.find(o => o.id == refund_item.id && !o.refund && o.ordered),
+                refunded_item   =   this.goods.find(o => o.id == refund_item.id && o.refund && o.ordered),
+                n               =   (refunded_item ? refunded_item.quantity : 0).toFloat();
+
+
+            if (refunding_item.quantity < refund_item.quantity.toFloat() + n) {
+                refund_item.quantity    =   refunding_item.quantity - n;
+                let me  =   this;
+                setTimeout(function () {
+                    me.$bus.$emit('showMessage', 'You cannot refund more than you\'ve bought!', 'danger');
+                }, 100);
+            }
+        },
         add_item(product) {
-            let item    =   _.find(this.goods, o => o.id == product.id);
+            if (this.view_mode && this.is_refunding) {
+                let refunding_item  =   this.goods.find(o => o.id == product.id && !o.refund && o.ordered);
+
+                if (refunding_item) {
+                    let refund_item     =   this.goods.find(o => o.id == product.id && o.refund && !o.ordered),
+                        refunded_item   =   this.goods.find(o => o.id == product.id && o.refund && o.ordered);
+
+                    if (refund_item) {
+                        if (refunding_item.quantity > refund_item.quantity + (refunded_item ? refunded_item.quantity : 0)) {
+                            refund_item.quantity++;
+                        } else {
+                            this.$bus.$emit('showMessage', 'You cannot refund more than you\'ve bought!', 'danger');
+                        }
+                    } else {
+                        if (refund_item || refunded_item) {
+                            if (refunding_item.quantity <= (refund_item ? refund_item.quantity : 0) + (refunded_item ? refunded_item.quantity : 0)) {
+                                this.$bus.$emit('showMessage', 'You cannot refund more than you\'ve bought!', 'danger');
+                                return false;
+                            }
+                        }
+
+                        this.goods.push({
+                            id              :   product.id,
+                            title           :   product.title,
+                            unit_price      :   product.price,
+                            quantity        :   product.quantity ? product.quantity : 1,
+                            refund          :   true,
+                            discountable    :   product.discountable,
+                            no_point        :   product.no_point,
+                            ordered         :   false
+                        });
+                    }
+                } else {
+                    this.$bus.$emit('showMessage', 'You can only refund what you\'ve bought!', 'danger');
+                }
+
+                return false;
+            }
+
+            let item    =   _.find(this.goods, o => o.id == product.id && o.refund == product.refund);
             if (item) {
-                item.quantity++;
+                item.quantity += product.quantity;
             } else {
                 this.goods.push({
                     id              :   product.id,
                     title           :   product.title,
                     unit_price      :   product.price,
                     quantity        :   product.quantity ? product.quantity : 1,
-                    refund          :   product.refund ? parseInt(product.refund) : parseInt(product.refund),
+                    refund          :   product.refund ? product.refund : false,
                     discountable    :   product.discountable,
-                    no_point        :   product.no_point
+                    no_point        :   product.no_point,
+                    ordered         :   product.order_item_id ? true : false
                 });
             }
         },
-        remove_item(id) {
-            let i   =   _.findIndex(this.goods, o => o.id == id);
+        remove_item(id, is_ordered, is_refund) {
+            let i   =   _.findIndex(this.goods, o => o.id == id && o.ordered == is_ordered && o.refund == is_refund);
             if (i >= 0) {
                 this.goods.splice(i, 1);
             }
@@ -243,6 +314,10 @@ export default {
                 this.do_receipt(receipt.order);
                 this.$bus.$emit('onMethdDominated', receipt.order.method);
             }
+
+            if (this.$route.query.refund && this.$route.query.refund == '1') {
+                this.is_refunding   =   true;
+            }
         },
         reset() {
             this.goods          =   [];
@@ -251,7 +326,9 @@ export default {
             this.view_mode      =   false;
             this.customer       =   null;
             this.coupon         =   null;
+            this.coupons        =   [];
             this.coupons_shown  =   false;
+            this.is_refunding   =   false;
         },
         toggle_coupons()
         {
@@ -293,8 +370,10 @@ export default {
         },
         cancel_discount(e)
         {
-            this.coupon     =   null;
-            this.discount   =   null;
+            if (!this.view_mode) {
+                this.coupon     =   null;
+                this.discount   =   null;
+            }
         }
     },
     created() {
@@ -303,8 +382,36 @@ export default {
         }
     },
     computed    :   {
-        sum() {
-            return this.sum_discountable + this.sum_nondiscountable;
+        has_refund_items()
+        {
+            return this.goods.filter( o => o.refund && !o.ordered).length;
+        },
+        refund_amount()
+        {
+            let discountable_amount     =   0,
+                nondiscountable_amount  =   0,
+                factor                  =   1;
+
+            if (this.discount && this.discount.by == '%') {
+                factor  -=  (this.discount.rate * 0.01);
+            }
+
+            this.goods.forEach((o) => {
+                if (o.refund && !o.ordered) {
+                    if (!o.discountable) {
+                        nondiscountable_amount +=  (o.quantity * o.unit_price * (o.refund ? -1 : 1));
+                    } else {
+                        discountable_amount +=  (o.quantity * o.unit_price * factor * (o.refund ? -1 : 1));
+                    }
+                }
+            });
+
+            if (this.discount && this.discount.by == '-') {
+                discountable_amount -=   this.discount.rate;
+                discountable_amount  =   discountable_amount < 0 ? 0 : discountable_amount;
+            }
+
+            return Math.abs(discountable_amount + nondiscountable_amount);
         },
         sum_nondiscountable()
         {
@@ -323,8 +430,8 @@ export default {
             let amount          =   0,
                 factor          =   1;
 
-            if (this.discount && this.discount.type == 'byPercentage') {
-                factor  -=  (this.discount.value * 0.01);
+            if (this.discount && this.discount.by == '%') {
+                factor  -=  (this.discount.rate * 0.01);
             }
 
             this.goods.forEach((o) => {
@@ -333,8 +440,8 @@ export default {
                 }
             });
 
-            if (this.discount && this.discount.type == 'byAmount') {
-                amount -=   this.discount.value;
+            if (this.discount && this.discount.by == '-') {
+                amount -=   this.discount.rate;
                 amount  =   amount < 0 ? 0 : amount;
             }
 

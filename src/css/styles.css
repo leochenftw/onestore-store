@@ -15878,6 +15878,7 @@ svg.barcode {
   overflow: hidden;
 }
 
+#top-float-menu,
 #btn-call-member-input,
 #btn-hold {
   position: absolute;
@@ -15891,6 +15892,7 @@ svg.barcode {
   visibility: none;
 }
 
+#top-float-menu.is-active,
 #btn-call-member-input.is-active,
 #btn-hold.is-active {
   top: 20px;
@@ -15902,6 +15904,11 @@ svg.barcode {
 
 #btn-hold {
   right: 72px;
+}
+
+#top-float-menu {
+  right: auto;
+  left: 24px;
 }
 
 #stash {
@@ -16086,4 +16093,9 @@ svg.barcode {
 
 .button.is-circle {
   border-radius: 50%;
+}
+
+.column.align-centered {
+  -ms-flex-item-align: center;
+      align-self: center;
 }

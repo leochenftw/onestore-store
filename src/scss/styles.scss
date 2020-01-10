@@ -43,3 +43,11 @@ $family-primary: source-han-sans-simplified-c, Helvetica, Arial, sans-serif;
         }
     }
 }
+
+.column {
+    &.align {
+        &-centered {
+            align-self: center;
+        }
+    }
+}

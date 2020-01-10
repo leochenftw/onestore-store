@@ -24,6 +24,7 @@ small {
     overflow: hidden;
 }
 
+#top-float-menu,
 #btn-call-member-input,
 #btn-hold {
     position: absolute;
@@ -43,6 +44,11 @@ small {
 
 #btn-hold {
     right: 72px;
+}
+
+#top-float-menu {
+    right: auto;
+    left: 24px;
 }
 
 #stash {
