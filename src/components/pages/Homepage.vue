@@ -237,9 +237,12 @@ export default {
                 return false;
             }
 
-            let item    =   _.find(this.goods, o => o.id == product.id && o.refund == product.refund);
+            let item    =   _.find(this.goods, (o) => {
+                let b   =   product.refund ? product.refund : false;
+                return o.id == product.id && o.refund == b;
+            });
             if (item) {
-                item.quantity += product.quantity;
+                item.quantity += (product.quantity ? product.quantity : 1);
             } else {
                 this.goods.push({
                     id              :   product.id,
