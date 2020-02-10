@@ -15,7 +15,7 @@
     </div>
     <div v-else-if="customer" class="columns is-marginless customer-details">
         <div class="column">
-            <p class="title is-6">Name: {{customer.first_name[0] + '*'}} {{customer.surname}}</p>
+            <p class="title is-6">Name: {{customer.first_name}} {{customer.surname}}</p>
             <p class="subtitle is-7">Points: {{customer.shop_points}}</p>
         </div>
         <div class="column is-narrow">
