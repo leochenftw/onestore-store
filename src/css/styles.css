@@ -15731,10 +15731,6 @@ label.panel-block:hover {
   text-decoration: underline;
 }
 
-.section.store-face .container.summary .button:first-child {
-  margin-right: 1em;
-}
-
 .section.store-face .container.summary .button.is-primary.is-outlined.is-active {
   background-color: #00d1b2;
   border-color: #00d1b2;

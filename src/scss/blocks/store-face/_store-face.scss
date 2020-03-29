@@ -147,9 +147,6 @@
             }
 
             .button {
-                &:first-child {
-                    margin-right: 1em;
-                }
                 &.is-primary.is-outlined {
                     &.is-active {
                         background-color: #00d1b2;

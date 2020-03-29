@@ -5,6 +5,7 @@
             <template v-if="!is_free">
                 <button :disabled="cash_disabled" @click.prevent="give_change" :class="['is-outlined button is-large is-warning', {'is-active': payment_method == 'Cash'}]">CASH</button>
                 <button :disabled="eftpos_disabled" @click.prevent="wait_eftpos" :class="['is-outlined button is-large is-primary', {'is-active': payment_method == 'EFTPOS'}]">EFTPOS</button>
+                <button :disabled="web_disabled" @click.prevent="wait_web" :class="['is-outlined button is-large is-info', {'is-active': payment_method == 'Web Order'}]">Web Order</button>
             </template>
             <button v-else :disabled="voucher_disabled" @click.prevent="voucher_payment" :class="['is-outlined button is-large is-danger', {'is-active': payment_method == 'Voucher'}]">VOUCHER</button>
         </div>
@@ -15,6 +16,7 @@
                 <button class="button is-large is-info is-outlined is-danger" @click.prevent="$parent.is_refunding = true;">Refund</button> -->
                 <button v-if="payment_method == 'Cash'" class="is-outlined button is-large is-warning is-active">CASH</button>
                 <button v-if="payment_method == 'EFTPOS'" class="is-outlined button is-large is-primary is-active">EFTPOS</button>
+                <button v-if="payment_method == 'Web Order'" class="is-outlined button is-large is-info is-active">Web Order</button>
                 <button v-if="payment_method == 'Voucher'" class="is-outlined button is-large is-danger is-active">VOUCHER</button>
             </template>
             <template v-else>
@@ -56,9 +58,11 @@ export default {
             eftpos_loading      :   false,
             voucher_loading     :   false,
             refund_loading      :   false,
+            web_loading         :   false,
             cash_disabled       :   false,
             eftpos_disabled     :   false,
             voucher_disabled    :   false,
+            web_disabled        :   false,
             payment_method      :   null,
             cash_taken          :   null
         }
@@ -154,6 +158,12 @@ export default {
             this.payment_method =   'EFTPOS';
             this.$bus.$emit('waitEFTPOS', this.total_amount, this.place_order);
         },
+        wait_web() {
+            if (confirm('You are placing this order as a WEB ORDER. Are you sure?')) {
+                this.payment_method =   'Web Order';
+                this.place_order('Web Order');
+            }
+        },
         voucher_payment()
         {
             this.place_order('Voucher');
@@ -215,12 +225,20 @@ export default {
                 this.eftpos_loading     =   true;
                 this.cash_disabled      =   true;
                 this.voucher_disabled   =   true;
+                this.web_disabled       =   true;
             } else if (by == 'Cash'){
                 this.cash_loading       =   true;
                 this.eftpos_disabled    =   true;
                 this.voucher_disabled   =   true;
+                this.web_disabled       =   true;
+            } else if (by == 'Web Order') {
+                this.web_loading        =   true;
+                this.cash_disabled      =   true;
+                this.eftpos_disabled    =   true;
+                this.voucher_disabled   =   true;
             } else {
                 this.voucher_loading    =   true;
+                this.web_disabled       =   true;
                 this.cash_disabled      =   true;
                 this.eftpos_disabled    =   true;
             }
@@ -258,10 +276,12 @@ export default {
                     });
                 });
             }).catch((error) => {
+                me.web_loading      =   false;
                 me.cash_loading     =   false;
                 me.eftpos_loading   =   false;
                 me.voucher_loading  =   false;
                 me.refund_loading   =   false;
+                me.web_disabled     =   false;
                 me.cash_disabled    =   false;
                 me.eftpos_disabled  =   false;
                 me.voucher_disabled =   false;
