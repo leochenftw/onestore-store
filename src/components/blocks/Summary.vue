@@ -142,8 +142,10 @@ export default {
             me.cash_loading     =   false;
             me.eftpos_loading   =   false;
             me.voucher_loading  =   false;
+            me.web_loading      =   false;
             me.refund_loading   =   false;
             me.cash_disabled    =   false;
+            me.web_disabled     =   false;
             me.eftpos_disabled  =   false;
             me.voucher_disabled =   false;
             me.payment_method   =   null;
@@ -177,7 +179,7 @@ export default {
                 return false;
             }
 
-            if (this.refund_loading || this.cash_loading || this.eftpos_loading || this.voucher_loading) return false;
+            if (this.refund_loading || this.cash_loading || this.eftpos_loading || this.voucher_loading || this.web_loading) return false;
 
             if (confirm('You are going to refund the customer: ' + this.refund_total.toDollar() + '. Do you want to proceed?')) {
                 let me      =   this,
@@ -202,7 +204,9 @@ export default {
                     me.eftpos_loading   =   false;
                     me.voucher_loading  =   false;
                     me.refund_loading   =   false;
+                    me.web_loading      =   false;
                     me.cash_disabled    =   false;
+                    me.web_disabled     =   false;
                     me.eftpos_disabled  =   false;
                     me.voucher_disabled =   false;
                     me.payment_method   =   null;
@@ -219,29 +223,22 @@ export default {
                 return false;
             }
 
-            if (this.refund_loading || this.cash_loading || this.eftpos_loading || this.voucher_loading) return false;
+            if (this.refund_loading || this.cash_loading || this.eftpos_loading || this.voucher_loading || this.web_loading) return false;
 
             if (by == 'EFTPOS') {
                 this.eftpos_loading     =   true;
-                this.cash_disabled      =   true;
-                this.voucher_disabled   =   true;
-                this.web_disabled       =   true;
             } else if (by == 'Cash'){
                 this.cash_loading       =   true;
-                this.eftpos_disabled    =   true;
-                this.voucher_disabled   =   true;
-                this.web_disabled       =   true;
             } else if (by == 'Web Order') {
                 this.web_loading        =   true;
-                this.cash_disabled      =   true;
-                this.eftpos_disabled    =   true;
-                this.voucher_disabled   =   true;
             } else {
                 this.voucher_loading    =   true;
-                this.web_disabled       =   true;
-                this.cash_disabled      =   true;
-                this.eftpos_disabled    =   true;
             }
+
+            this.web_disabled       =   true;
+            this.cash_disabled      =   true;
+            this.eftpos_disabled    =   true;
+            this.voucher_disabled   =   true;
 
             let me      =   this,
                 params  =   new FormData();
@@ -297,10 +294,12 @@ export default {
             me.cash_loading     =   false;
             me.eftpos_loading   =   false;
             me.voucher_loading  =   false;
+            me.web_loading      =   false;
             me.refund_loading   =   false;
             me.cash_disabled    =   false;
             me.eftpos_disabled  =   false;
             me.voucher_disabled =   false;
+            me.web_disabled     =   false;
             me.payment_method   =   null;
             me.cash_taken       =   null;
             me.coupons_clicked  =   false;
@@ -317,8 +316,10 @@ export default {
                 me.refund_loading   =   false;
                 me.voucher_loading  =   false;
                 me.cash_disabled    =   false;
+                me.web_loading      =   false;
                 me.eftpos_disabled  =   false;
                 me.voucher_disabled =   false;
+                me.web_disabled     =   false;
                 me.payment_method   =   null;
                 me.cash_taken       =   null;
                 me.coupons_clicked  =   false;
